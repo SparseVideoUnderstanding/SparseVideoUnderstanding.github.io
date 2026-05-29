@@ -204,6 +204,7 @@ const KEYS = ["P", "O", "H", "U", "R"];
     document.body.removeChild(ta);
   }
 
+  const label = btn.querySelector(".bibtex-copy-label");
   btn.addEventListener("click", async () => {
     const text = pre.textContent;
     try {
@@ -215,11 +216,11 @@ const KEYS = ["P", "O", "H", "U", "R"];
     } catch (e) {
       fallbackCopy(text);
     }
-    btn.textContent = "Copied!";
     btn.classList.add("is-copied");
+    if (label) label.textContent = "Copied!";
     setTimeout(() => {
-      btn.textContent = "Copy";
       btn.classList.remove("is-copied");
+      if (label) label.textContent = "Copy";
     }, 1800);
   });
 })();

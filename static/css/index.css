@@ -620,21 +620,47 @@ pre.bibtex {
 
 .bibtex-copy {
   position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  border: 1px solid #4a4a4a;
-  background: #3a3a3a;
-  color: #f1f1f1;
+  top: 0.55rem;
+  right: 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #d6d6d6;
   border-radius: 6px;
-  padding: 0.3rem 0.8rem;
-  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
+  line-height: 1;
   transition: all 0.15s ease;
 }
 
-.bibtex-copy:hover { background: #d24d3f; border-color: #d24d3f; }
-.bibtex-copy.is-copied { background: #2e9e5b; border-color: #2e9e5b; }
+.bibtex-copy svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: currentColor;
+}
+
+.bibtex-copy .ic-check { display: none; }
+
+.bibtex-copy:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.bibtex-copy.is-copied {
+  color: #6ee7a0;
+  border-color: rgba(110, 231, 160, 0.4);
+  background: rgba(110, 231, 160, 0.12);
+}
+
+.bibtex-copy.is-copied .ic-copy { display: none; }
+.bibtex-copy.is-copied .ic-check { display: inline; }
+
+/* keep code clear of the button on narrow blocks */
+pre.bibtex { padding-top: 2.4rem; }
 
 /* ---------- Footer ---------- */
 .footer {

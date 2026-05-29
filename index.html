@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="static/css/index.css?v=20260529b">
 </head>
 <body>
 
@@ -250,7 +250,11 @@
   <div class="container is-max-desktop content-narrow">
     <h2 class="title is-3 has-text-centered section-title">BibTeX</h2>
     <div class="bibtex-wrap">
-      <button id="bibtexCopy" class="bibtex-copy" type="button" aria-label="Copy BibTeX">Copy</button>
+      <button id="bibtexCopy" class="bibtex-copy" type="button" aria-label="Copy BibTeX">
+        <svg class="ic-copy" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
+        <svg class="ic-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span class="bibtex-copy-label">Copy</span>
+      </button>
     <pre class="bibtex" id="bibtex">@article{xu2026towards,
   title={Towards Sparse Video Understanding and Reasoning},
   author={Xu, Chenwei and Ye, Zhen and Wu, Shang and Li, Weijian and Wang, Zihan and Xia, Zhuofan and Lu, Lie and Maneriker, Pranav and Du, Fan and Li, Manling and others},
@@ -292,6 +296,6 @@
   </div>
 </footer>
 
-<script src="static/js/qual.js"></script>
+<script src="static/js/qual.js?v=20260529b"></script>
 </body>
 </html>
