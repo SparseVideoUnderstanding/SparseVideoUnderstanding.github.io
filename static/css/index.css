@@ -451,7 +451,132 @@ body {
 
 .pohr-val { color: #333; }
 
-/* action line */
+/* ---- conversation transcript ---- */
+.qual-convo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  margin-top: 0.4rem;
+}
+
+.qual-round {
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 0.9rem 1rem 1.1rem;
+  background: #fff;
+  animation: qualFade 0.4s ease;
+}
+
+.qual-round.is-current {
+  border-color: #f0b9b1;
+  box-shadow: 0 4px 18px rgba(210, 77, 63, 0.1);
+}
+
+.round-label {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #d24d3f;
+  background: #fff5f3;
+  border-radius: 6px;
+  padding: 0.18rem 0.6rem;
+  margin-bottom: 0.7rem;
+}
+
+.turn {
+  border-radius: 10px;
+  padding: 0.8rem 0.95rem;
+}
+
+.turn + .turn { margin-top: 0.7rem; }
+
+.turn-user { background: #f5f6f8; }
+
+.turn-agent {
+  background: #fff;
+  border: 1px solid #ead6d3;
+}
+
+.turn-head {
+  font-size: 0.82rem;
+  color: #888;
+  margin-bottom: 0.55rem;
+}
+
+.turn-who {
+  font-weight: 800;
+  border-radius: 6px;
+  padding: 0.08rem 0.5rem;
+  margin-right: 0.4rem;
+  color: #fff;
+}
+
+.who-prompt { background: #6b7280; }
+.who-agent { background: #d24d3f; }
+
+.turn-q {
+  font-weight: 600;
+  font-size: 1.02rem;
+  margin-bottom: 0.4rem;
+}
+
+.turn-note {
+  font-size: 0.85rem;
+  color: #777;
+  margin-bottom: 0.6rem;
+}
+
+.carried {
+  margin-top: 0.7rem;
+  border: 1px dashed #c9b3b0;
+  border-radius: 9px;
+  background: #fbf6f5;
+  padding: 0.6rem 0.8rem;
+}
+
+.carried-head {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #a85248;
+  margin-bottom: 0.4rem;
+}
+
+.pohr.is-compact .pohr-row {
+  font-size: 0.85rem;
+  padding: 0.18rem 0;
+}
+
+.raw-tag {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.86rem;
+  color: #555;
+  padding: 0.1rem 0;
+}
+
+.raw-tag.is-answer,
+.raw-tag.is-request {
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-weight: 700;
+}
+
+.raw-tag.is-answer { background: #eafaf0; color: #1f7a45; }
+.raw-tag.is-request { background: #fff5f3; color: #b23a2e; }
+
+.raw-gloss {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 500;
+  color: inherit;
+  opacity: 0.85;
+  margin-left: 0.4rem;
+}
+
+.qual-convo .pohr { margin: 0.3rem 0; }
+
+/* action line (legacy) */
 .qual-action {
   margin-top: 1rem;
   border-radius: 10px;
@@ -480,6 +605,10 @@ body {
 }
 
 /* ---------- BibTeX ---------- */
+.bibtex-wrap {
+  position: relative;
+}
+
 pre.bibtex {
   background: #2b2b2b;
   color: #f1f1f1;
@@ -488,6 +617,24 @@ pre.bibtex {
   font-size: 0.9rem;
   overflow-x: auto;
 }
+
+.bibtex-copy {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  border: 1px solid #4a4a4a;
+  background: #3a3a3a;
+  color: #f1f1f1;
+  border-radius: 6px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bibtex-copy:hover { background: #d24d3f; border-color: #d24d3f; }
+.bibtex-copy.is-copied { background: #2e9e5b; border-color: #2e9e5b; }
 
 /* ---------- Footer ---------- */
 .footer {

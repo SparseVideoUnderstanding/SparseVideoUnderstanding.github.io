@@ -176,16 +176,17 @@
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered section-title">Qualitative Example</h2>
     <p class="has-text-centered qual-sub">
-      A <strong>real ReViSe rollout</strong> on NExT-QA &mdash; step through the rounds to watch the
-      agent gather evidence, update its summary, and stop once it is confident. Frames are the
-      actual ones the agent selected each round.
+      A <strong>real ReViSe rollout</strong> on NExT-QA &mdash; the actual per-round conversation.
+      Each round the agent receives a few frames plus its carried summary, then emits an updated
+      summary and either requests more frames or answers. Step through to watch it unfold; note that
+      <strong>only the summary is passed between rounds</strong> &mdash; never raw frames.
     </p>
 
     <div class="qual-card">
       <div class="qual-question">
         <span class="qual-q-label">Q</span>
-        <span>How does the girl deliver the food on the table to her mouth at the end?
-          <span class="qual-meta-chip" id="qualMeta">NExT-QA &middot; 42&nbsp;s clip</span>
+        <span>How did the lady holding the baby react when the baby smiles happily in the middle of the video?
+          <span class="qual-meta-chip" id="qualMeta">NExT-QA &middot; 24&nbsp;s clip</span>
         </span>
       </div>
 
@@ -194,17 +195,13 @@
       <div class="qual-controls">
         <button class="qual-tab" type="button">Round 1</button>
         <button class="qual-tab" type="button">Round 2</button>
-        <button class="qual-tab" type="button">Round 3</button>
         <span class="qual-seen" id="qualSeen"></span>
         <button class="qual-play" id="qualPlay" type="button">&#9654; Play</button>
       </div>
 
       <div class="qual-progress"><div class="qual-progress-bar" id="qualBar"></div></div>
 
-      <p class="qual-note" id="qualNote"></p>
-      <div class="qual-frames" id="qualFrames"></div>
-      <div class="qual-pohr" id="qualPohr"></div>
-      <div class="qual-action" id="qualAction"></div>
+      <div class="qual-convo" id="qualConvo"></div>
     </div>
   </div>
 </section>
@@ -252,14 +249,15 @@
 <section class="section">
   <div class="container is-max-desktop content-narrow">
     <h2 class="title is-3 has-text-centered section-title">BibTeX</h2>
-    <pre class="bibtex">@inproceedings{xu2026revise,
-  title     = {Towards Sparse Video Understanding and Reasoning},
-  author    = {Xu, Chenwei and Ye, Zhen and Wu, Shang and Li, Weijian and
-               Wang, Zihan and Xia, Zhuofan and Lu, Lie and Maneriker, Pranav and
-               Du, Fan and Li, Manling and Liu, Han},
-  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year      = {2026}
+    <div class="bibtex-wrap">
+      <button id="bibtexCopy" class="bibtex-copy" type="button" aria-label="Copy BibTeX">Copy</button>
+    <pre class="bibtex" id="bibtex">@article{xu2026towards,
+  title={Towards Sparse Video Understanding and Reasoning},
+  author={Xu, Chenwei and Ye, Zhen and Wu, Shang and Li, Weijian and Wang, Zihan and Xia, Zhuofan and Lu, Lie and Maneriker, Pranav and Du, Fan and Li, Manling and others},
+  journal={arXiv preprint arXiv:2602.13602},
+  year={2026}
 }</pre>
+    </div>
   </div>
 </section>
 
@@ -270,12 +268,11 @@
     <p class="has-text-centered qual-sub" style="margin-bottom:1.3rem;">
       A walkthrough of the method, the summary-as-state loop, and the EAGER reward.
     </p>
-    <div class="video-wrap">
-      <iframe src="https://www.youtube.com/embed/EPhPuTWvg7Y?start=2"
-              title="ReViSe paper walkthrough"
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen></iframe>
+    <div class="has-text-centered">
+      <a class="link-button" href="https://www.youtube.com/watch?v=EPhPuTWvg7Y&t=2s" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12c0 1.95.16 3.9.5 5.8a3.02 3.02 0 0 0 2.12 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14c.34-1.9.5-3.85.5-5.8s-.16-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+        Watch on YouTube
+      </a>
     </div>
   </div>
 </section>
