@@ -1,9 +1,9 @@
 /* ReViSe trajectories on NExT-QA clips.
-   These rollouts follow ReViSe's protocol with the corrected answer-round
-   format: SELECT rounds emit <summary>(POHR)+<frames>; the final ANSWER round
-   emits <think>+<answer> (no summary). The reasoning was produced by inspecting
-   the actual extracted frames, so every observation is grounded in the clip.
-   Videos: NExT-QA (Xiao et al., CVPR 2021). */
+   Corrected protocol: EVERY round begins with <think> (free-form reasoning).
+   SELECT rounds: <think> + <summary>(POHR) + <frames>.
+   ANSWER round:  <think> + <answer> (no summary — it is terminal).
+   The reasoning was produced by inspecting the actual extracted frames, so every
+   observation is grounded in the clip. Videos: NExT-QA (Xiao et al., CVPR 2021). */
 
 window.QUAL_EXAMPLES = [
   {
@@ -18,6 +18,7 @@ window.QUAL_EXAMPLES = [
     rounds: [
       {
         frames: [0, 146, 292, 438, 584],
+        think: "The clip jumps between a few scenes; the only one relevant to the question is the woman holding the baby. At frame 292 the baby is clearly smiling, but the woman's face is turned away there, so I cannot read her reaction yet. I should look at the frames right after 292 to catch her expression while the baby is still smiling.",
         summary: {
           P: "Viewed 5 uniformly sampled frames (0, 146, 292, 438, 584) spanning the clip.",
           O: "The clip mixes scenes — a boy drinking/eating at a table, and a woman holding a baby. In frame 292 the baby is smiling broadly, but the woman's face is turned away, so her reaction is not visible.",
@@ -46,6 +47,7 @@ window.QUAL_EXAMPLES = [
     rounds: [
       {
         frames: [0, 246, 492, 737, 983],
+        think: "All five frames show children on a big wooden wheel built over a water channel, holding a bamboo rail and stepping on it. It looks like a foot-powered water wheel, which would move water — but at this distance I cannot be sure the paddles are actually pushing water rather than the kids just playing on it. Let me pull closer frames of the wheel and channel.",
         summary: {
           P: "Viewed 5 uniformly sampled frames (0, 246, 492, 737, 983) across the clip.",
           O: "Children take turns stepping on a large wooden paddle wheel built over a water channel in a garden, steadying themselves on a bamboo rail; the wheel's paddles dip into the channel below.",
@@ -74,6 +76,7 @@ window.QUAL_EXAMPLES = [
     rounds: [
       {
         frames: [0, 442, 883, 1324, 1766],
+        think: "She is at a sand table with a yellow bucket and scoops, repeatedly filling and handling the bucket. The question is specifically about what she does right after the first fill, and these uniform frames do not pin that moment down. I will look at earlier frames near the first fill.",
         summary: {
           P: "Viewed 5 uniformly sampled frames (0, 442, 883, 1324, 1766) across the clip.",
           O: "A toddler is playing at a sand table with a yellow bucket and scoops. Across the sampled frames she repeatedly scoops sand into the bucket and handles it, but the moment right after the first fill is not pinned down.",
@@ -85,6 +88,7 @@ window.QUAL_EXAMPLES = [
       },
       {
         frames: [221, 663, 1104],
+        think: "Frame 221 catches the first fill — she scoops sand into the yellow bucket. Right after (663, 1104) she sets the scoop down and reaches toward the bucket with her hand, staying at the table rather than carrying it off. I still cannot tell whether she is about to empty it or refill it, so let me look around frame 884.",
         summary: {
           P: "Seen so far: the uniform frames plus 221, 663, 1104.",
           O: "In frame 221 she scoops sand into the yellow bucket (the first fill); just after, in 663 and 1104 she sets the scoop down and reaches toward the bucket with her hand.",
@@ -96,6 +100,7 @@ window.QUAL_EXAMPLES = [
       },
       {
         frames: [884, 1105],
+        think: "In 884 and 1105 she is tipping the yellow bucket while her hand is in the sand — it looks like she is emptying it rather than adding more. I want one more confirmation that sand is actually leaving the bucket before I answer.",
         summary: {
           P: "Seen so far: earlier frames plus 884, 1105.",
           O: "She tips the yellow bucket while her hand is in the sand; the bucket appears to be emptying rather than being carried off.",
@@ -107,6 +112,7 @@ window.QUAL_EXAMPLES = [
       },
       {
         frames: [664, 885, 1106],
+        think: "885 shows her tilting the bucket over the table and 1106 shows her reaching into the spilled sand — this is clearly emptying, not filling. Let me grab the surrounding frames including the clearest pour to be certain.",
         summary: {
           P: "Seen so far: earlier frames plus 664, 885, 1106.",
           O: "In 885 she tilts the bucket over the table and in 1106 she reaches into the spilled sand — the bucket is clearly being emptied.",
