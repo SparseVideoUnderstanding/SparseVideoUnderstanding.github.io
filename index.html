@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=20260529b">
+  <link rel="stylesheet" href="static/css/index.css?v=20260529c">
 </head>
 <body>
 
@@ -176,33 +176,49 @@
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered section-title">Qualitative Example</h2>
     <p class="has-text-centered qual-sub">
-      A <strong>real ReViSe rollout</strong> on NExT-QA &mdash; the actual per-round conversation.
+      <strong>Real ReViSe rollouts</strong> on NExT-QA &mdash; the actual per-round conversation.
       Each round the agent receives a few frames plus its carried summary, then emits an updated
-      summary and either requests more frames or answers. Step through to watch it unfold; note that
-      <strong>only the summary is passed between rounds</strong> &mdash; never raw frames.
+      summary and either requests more frames or answers. Pick an example, watch the original clip,
+      and step through the rounds. Note that <strong>only the summary is passed between rounds</strong>
+      &mdash; never raw frames.
     </p>
 
+    <!-- example switcher -->
+    <div class="qual-examples" id="qualExamples"></div>
+
     <div class="qual-card">
-      <div class="qual-question">
-        <span class="qual-q-label">Q</span>
-        <span>How did the lady holding the baby react when the baby smiles happily in the middle of the video?
-          <span class="qual-meta-chip" id="qualMeta">NExT-QA &middot; 24&nbsp;s clip</span>
-        </span>
+      <div class="qual-top">
+        <div class="qual-video-col">
+          <video id="qualVideo" class="qual-video" controls preload="metadata" playsinline muted></video>
+          <p class="qual-video-cap">Original clip</p>
+        </div>
+        <div class="qual-qa-col">
+          <div class="qual-question">
+            <span class="qual-q-label">Q</span>
+            <span id="qualQ"></span>
+          </div>
+          <p class="qual-meta-chip" id="qualMeta"></p>
+          <div class="qual-options" id="qualOptions"></div>
+        </div>
       </div>
 
-      <div class="qual-options" id="qualOptions"></div>
-
       <div class="qual-controls">
-        <button class="qual-tab" type="button">Round 1</button>
-        <button class="qual-tab" type="button">Round 2</button>
+        <span class="qual-controls-label">Conversation</span>
+        <span class="qual-tabs" id="qualTabs"></span>
         <span class="qual-seen" id="qualSeen"></span>
-        <button class="qual-play" id="qualPlay" type="button">&#9654; Play</button>
+        <button class="qual-play" id="qualPlay" type="button">&#9654; Play rounds</button>
       </div>
 
       <div class="qual-progress"><div class="qual-progress-bar" id="qualBar"></div></div>
 
       <div class="qual-convo" id="qualConvo"></div>
     </div>
+
+    <p class="qual-credit">
+      Example videos are from the <a href="https://github.com/doc-doc/NExT-QA" target="_blank" rel="noopener">NExT-QA</a>
+      dataset &mdash; J.&nbsp;Xiao, X.&nbsp;Shang, A.&nbsp;Yao, T.-S.&nbsp;Chua,
+      &ldquo;NExT-QA: Next Phase of Question-Answering to Explaining Temporal Actions,&rdquo; CVPR&nbsp;2021.
+    </p>
   </div>
 </section>
 
@@ -296,6 +312,6 @@
   </div>
 </footer>
 
-<script src="static/js/qual.js?v=20260529b"></script>
+<script src="static/js/qual.js?v=20260529c"></script>
 </body>
 </html>
