@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>REVISE: Reasoning with Video Sparsity</title>
+  <meta name="description" content="REVISE — a multi-round agent for question-aware sparse video understanding. It selects a few informative frames, keeps a compact summary-as-state, and stops early when confident.">
+
+  <meta property="og:title" content="REVISE: Towards Sparse Video Understanding and Reasoning">
+  <meta property="og:description" content="A multi-round agent that selects informative frames, maintains a summary-as-state, and stops early when confident.">
+  <meta property="og:image" content="static/images/overview.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+      <h1 class="title is-2 publication-title">
+        Towards Sparse Video Understanding and Reasoning
+      </h1>
+      <p class="subtitle is-4" style="margin-top:0.75rem;">
+        <span class="revise-mark">REVISE</span> &mdash; <em>Reasoning with Video Sparsity</em>
+      </p>
+
+      <div class="publication-authors">
+        <span class="author-block">Chenwei Xu<span class="sup">1</span></span>
+        <span class="author-block">Zhen Ye<span class="sup">2</span></span>
+        <span class="author-block">Shang Wu<span class="sup">1</span></span>
+        <span class="author-block">Weijian Li<span class="sup">1</span></span>
+        <span class="author-block">Zihan Wang<span class="sup">1</span></span>
+        <span class="author-block">Zhuofan Xia<span class="sup">1</span></span>
+        <br>
+        <span class="author-block">Lie Lu<span class="sup">3</span></span>
+        <span class="author-block">Pranav Maneriker<span class="sup">3</span></span>
+        <span class="author-block">Fan Du<span class="sup">3</span></span>
+        <span class="author-block">Manling Li<span class="sup">1</span></span>
+        <span class="author-block">Han Liu<span class="sup">1</span></span>
+      </div>
+
+      <div class="affiliation-row">
+        <span class="sup">1</span>&nbsp;Northwestern University &nbsp;&nbsp;
+        <span class="sup">2</span>&nbsp;Johns Hopkins University &nbsp;&nbsp;
+        <span class="sup">3</span>&nbsp;Dolby Laboratories
+      </div>
+
+      <div class="link-buttons">
+        <!-- arXiv (placeholder link — update once posted) -->
+        <a class="link-button" href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v2H3V4zm0 5h18v2H3V9zm0 5h12v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+          arXiv
+        </a>
+        <!-- Code -->
+        <a class="link-button" href="https://github.com/Chenwei-1999/Sparse_Video_Understanding" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.16-.02-2.1-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 2.9-.39c.98 0 1.97.13 2.9.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.68.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5z"/></svg>
+          Code
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ABSTRACT ===================== -->
+<section class="section">
+  <div class="container is-max-desktop content-narrow">
+    <h2 class="title is-3 has-text-centered section-title">Abstract</h2>
+    <p class="abstract-text">
+      We present <span class="revise-mark">REVISE</span>
+      (<u>Re</u>asoning with <u>Vi</u>deo <u>S</u>parsity), a multi-round agent for video
+      question answering (VQA). Instead of uniformly sampling frames, REVISE selects a small set
+      of informative frames, maintains a <strong>summary-as-state</strong> across rounds, and
+      stops early when confident. It supports proprietary vision-language models (VLMs) in a
+      &ldquo;plug-and-play&rdquo; setting and enables reinforcement fine-tuning for open-source
+      models. For fine-tuning, we introduce <strong>EAGER</strong> (Evidence-Adjusted Gain for
+      Efficient Reasoning), an annotation-free reward with three terms:
+      (1)&nbsp;<em>Confidence gain</em>: after new frames are added, we reward the increase in the
+      log-odds gap between the correct option and the strongest alternative;
+      (2)&nbsp;<em>Summary sufficiency</em>: at answer time we re-ask using only the last committed
+      summary and reward success; (3)&nbsp;<em>Correct-and-early stop</em>: answering correctly
+      within a small turn budget is rewarded. Across multiple VQA benchmarks, REVISE improves
+      accuracy while reducing frames, rounds, and prompt tokens, demonstrating practical sparse
+      video reasoning.
+    </p>
+  </div>
+</section>
+
+<!-- ===================== METHOD ===================== -->
+<section class="section section-tint">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered section-title">Method</h2>
+
+    <div class="content-narrow">
+      <h3 class="title is-4">Summary-as-State</h3>
+      <p>
+        REVISE operates analogously to a recurrent neural network: it maintains a compact state
+        that propagates information from previous rounds to the VLM, <strong>without re-admitting
+        raw frames or conversation history</strong>. This is the load-bearing design choice that
+        keeps the context compact even as evidence accumulates.
+      </p>
+    </div>
+
+    <div class="figure-block">
+      <img src="static/images/summary_as_state.png" alt="Summary-as-state recurrence" style="max-width:340px;">
+    </div>
+
+    <div class="content-narrow">
+      <p>
+        Each round, the agent receives sampled video frames, the question, and its current summary
+        state. It produces a structured summary using the <strong>POHR</strong> format:
+      </p>
+
+      <table class="table is-fullwidth pohr-table">
+        <tbody>
+          <tr><td><span class="pohr-key">P</span> Previously seen</td><td>What frames have been inspected so far</td></tr>
+          <tr><td><span class="pohr-key">O</span> Observations</td><td>What was just observed in the current frames</td></tr>
+          <tr><td><span class="pohr-key">H</span> Hypotheses</td><td>How observations update the current belief</td></tr>
+          <tr><td><span class="pohr-key">U</span> Uncertainties</td><td>What remains unclear</td></tr>
+          <tr><td><span class="pohr-key">R</span> Reasons</td><td>Why specific new frames are needed, or why the question is now answerable</td></tr>
+        </tbody>
+      </table>
+
+      <p>
+        The agent then either requests more frames (<code>&lt;frames&gt;</code>) or produces a
+        final answer (<code>&lt;answer&gt;</code>). Only the summary persists between rounds &mdash;
+        not raw frames or conversation history &mdash; keeping the context compact.
+      </p>
+    </div>
+
+    <div class="figure-block">
+      <img src="static/images/overview.png" alt="REVISE multi-round pipeline overview">
+      <p class="figure-caption">
+        The REVISE agent loop: sample frames &rarr; update the POHR summary &rarr; request targeted
+        frames or commit an answer.
+      </p>
+    </div>
+
+    <!-- Two modes -->
+    <div class="columns content-narrow" style="margin-top:1.5rem;">
+      <div class="column">
+        <div class="mode-card">
+          <h4>1&nbsp;&middot;&nbsp;Plug-and-play</h4>
+          <p>
+            Wraps any VLM &mdash; including proprietary APIs like GPT-4o &mdash; as a frozen
+            black box. No parameter updates needed.
+          </p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="mode-card">
+          <h4>2&nbsp;&middot;&nbsp;RL fine-tuning</h4>
+          <p>
+            GRPO with the <strong>EAGER</strong> reward, combining three annotation-free terms:
+          </p>
+          <ul class="eager-list">
+            <li><span class="eager-term">Confidence gain</span> &mdash; reward the increased log-odds gap to the correct option after adding frames.</li>
+            <li><span class="eager-term">Summary sufficiency</span> &mdash; re-ask using only the committed summary and reward success.</li>
+            <li><span class="eager-term">Correct-and-early stop</span> &mdash; reward answering correctly within a small turn budget.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== QUALITATIVE EXAMPLE ===================== -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered section-title">Qualitative Example</h2>
+    <div class="figure-block">
+      <img src="static/images/sketch.png" alt="Qualitative example of the REVISE agent loop">
+      <p class="figure-caption">
+        The agent starts with 3 uniformly sampled frames, updates its POHR summary, identifies an
+        uncertainty, requests targeted frames, and arrives at the answer &mdash; all within
+        <strong>2 rounds using only 6 frames</strong> from a 15-second video.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RESULTS ===================== -->
+<section class="section section-tint">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered section-title">Results</h2>
+
+    <div class="content-narrow">
+      <table class="table is-fullwidth is-bordered results-table">
+        <thead>
+          <tr>
+            <th>Benchmark</th>
+            <th>Model</th>
+            <th>Accuracy</th>
+            <th>Avg. Frames</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>VideoEspresso</td><td>GPT-4o + REVISE</td><td>48.9%</td><td>8.0</td></tr>
+          <tr><td>NExT-QA</td><td>GPT-4o + REVISE</td><td>63.8%</td><td>8.4</td></tr>
+          <tr><td>EgoSchema</td><td>GPT-4o + REVISE</td><td>60.6%</td><td>9.8</td></tr>
+          <tr class="highlight-row"><td>NExT-QA</td><td>Qwen2.5-VL-3B + REVISE + RL</td><td>51.3%</td><td>3.9</td></tr>
+        </tbody>
+      </table>
+
+      <p class="has-text-centered" style="margin-top:1rem;">
+        RL fine-tuning yields <span class="delta-pill">+19.6pp</span> accuracy over plug-and-play on
+        NExT-QA while using <strong>fewer frames, fewer rounds, and nearly 2&times; faster inference</strong>.
+      </p>
+    </div>
+
+    <div class="figure-block">
+      <img src="static/images/pareto.png" alt="Accuracy vs. average frame budget Pareto frontier" style="max-width:620px;">
+      <p class="figure-caption">
+        More rounds yield better accuracy at lower average frame budgets &mdash; the agent learns
+        to stop early when confident.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BIBTEX ===================== -->
+<section class="section">
+  <div class="container is-max-desktop content-narrow">
+    <h2 class="title is-3 has-text-centered section-title">BibTeX</h2>
+    <pre class="bibtex">@inproceedings{xu2026revise,
+  title     = {Towards Sparse Video Understanding and Reasoning},
+  author    = {Xu, Chenwei and Ye, Zhen and Wu, Shang and Li, Weijian and
+               Wang, Zihan and Xia, Zhuofan and Lu, Lie and Maneriker, Pranav and
+               Du, Fan and Li, Manling and Liu, Han},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2026}
+}</pre>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <div class="container has-text-centered">
+    <p>
+      &copy; 2026 The REVISE Authors. Code released under the repository
+      <a href="https://github.com/Chenwei-1999/Sparse_Video_Understanding" target="_blank" rel="noopener">LICENSE</a>.
+    </p>
+    <p style="margin-top:0.4rem;">
+      Page layout adapted from the
+      <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" rel="noopener">Nerfies</a>
+      academic project template.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
