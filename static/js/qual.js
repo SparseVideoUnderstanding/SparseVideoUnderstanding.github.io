@@ -1,12 +1,10 @@
 /* Interactive qualitative examples — real ReViSe rollouts on NExT-QA.
-   Data (window.QUAL_EXAMPLES, see qual_data.js) is transcribed VERBATIM from the
-   run log: the complete system prompt, the complete per-round user prompt, and
-   the complete raw model response. Nothing is paraphrased.
+   window.QUAL_EXAMPLES (qual_data.js) holds the VERBATIM run-log text: the full
+   system prompt, the full per-round user prompt, and the full raw response.
+   This file parses that verbatim text into a clean, structured view (and still
+   exposes the exact raw text under "Show raw …").
 
-   Note on "thinking": ReViSe's output format forbids <think> — the model emits
-   ONLY <summary>...</summary> followed by <frames> or <answer>. The POHR summary
-   IS the model's reasoning; there is no separate hidden chain of thought.
-
+   ReViSe's format forbids <think>; the POHR <summary> IS the model's reasoning.
    Source videos: NExT-QA (Xiao et al., CVPR 2021). */
 
 const POHR_LABELS = { P: "Previously seen", O: "Observations", H: "Hypotheses", U: "Uncertainties", R: "Reasons" };
@@ -15,7 +13,7 @@ const KEYS = ["P", "O", "H", "U", "R"];
 (function () {
   const DATA = window.QUAL_EXAMPLES || [];
   let curEx = 0;
-  let view = "all"; // "all" or 0-based round index
+  let view = "all";
   let timer = null;
 
   const el = (id) => document.getElementById(id);
@@ -37,22 +35,46 @@ const KEYS = ["P", "O", "H", "U", "R"];
   const tstamp = (f) => (f / E().fps).toFixed(1);
   const framePath = (f) => `static/images/qual/${E().id}/frame_${f}.jpg`;
   const lastIdx = () => E().rounds.length - 1;
+  const esc = (s) => (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-  function esc(s) {
-    return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-
-  function parsePOHR(raw) {
-    const m = /<summary>([\s\S]*?)<\/summary>/.exec(raw || "");
-    if (!m) return null;
-    const body = m[1];
+  function parsePOHR(summaryBody) {
+    if (!summaryBody) return null;
     const out = {};
     KEYS.forEach((k) => {
-      const rx = new RegExp(k + ":\\s*([\\s\\S]*?)\\s*(?:;\\s*[POHUR]:|$)");
-      const mm = rx.exec(body);
+      const mm = new RegExp(k + ":\\s*([\\s\\S]*?)\\s*(?:;\\s*[POHUR]:|$)").exec(summaryBody);
       out[k] = mm ? mm[1].trim() : "";
     });
     return out;
+  }
+
+  // pull structured pieces out of the verbatim user prompt
+  function parsePrompt(t) {
+    const grab = (re) => { const m = re.exec(t); return m ? m[1].trim() : ""; };
+    const sm = /Current summary:\s*<summary>([\s\S]*?)<\/summary>/.exec(t);
+    return {
+      q: grab(/Question:\s*([^\n]*)/),
+      instr: grab(/To answer, output\s*([^\n]*)/),
+      L: grab(/Total frames L\s*=\s*(\d+)/),
+      seen: grab(/Seen frames[^:]*:\s*([^\n]*)/),
+      ranges: grab(/Allowed unseen frame ranges[^:]*:\s*([^\n]*)/),
+      summary: sm ? sm[1].trim() : ""
+    };
+  }
+  const isPlaceholder = (s) => /I will summarize|I will record|I will update|request more evidence if needed/.test(s);
+
+  function actionFromRaw(raw) {
+    const fr = /<frames>([^<]*)<\/frames>/.exec(raw);
+    if (fr) {
+      return `<div class="qual-action is-request"><span class="act-tag">&lt;frames&gt;</span>
+        requests frames <strong>${esc(fr[1].trim())}</strong> &rarr; next round</div>`;
+    }
+    const an = /<answer>\s*([A-E])/.exec(raw);
+    if (an) {
+      const li = an[1].charCodeAt(0) - 65;
+      return `<div class="qual-action is-answer"><span class="act-tag">&lt;answer&gt;</span>
+        <strong>${an[1]}</strong> &mdash; &ldquo;${esc(E().choices[li])}&rdquo; <span class="qual-correct">&#10003; correct</span></div>`;
+    }
+    return "";
   }
 
   function renderOptions(showAnswer) {
@@ -78,9 +100,9 @@ const KEYS = ["P", "O", "H", "U", "R"];
       .join("")}</div>`;
   }
 
-  function pohrBlock(sum) {
+  function pohrBlock(sum, compact) {
     if (!sum) return "";
-    return `<div class="pohr">${KEYS.map(
+    return `<div class="pohr${compact ? " is-compact" : ""}">${KEYS.map(
       (k) => `<div class="pohr-row">
         <span class="pohr-badge pohr-${k}">${k}</span>
         <span class="pohr-label">${POHR_LABELS[k]}</span>
@@ -89,31 +111,58 @@ const KEYS = ["P", "O", "H", "U", "R"];
     ).join("")}</div>`;
   }
 
+  function field(title, inner) {
+    return `<div class="pfield"><div class="pfield-h">${title}</div>${inner}</div>`;
+  }
+
   function roundHTML(r, idx) {
     const isFinal = idx === lastIdx();
-    const pohr = parsePOHR(r.raw_output);
+    const p = parsePrompt(r.user_text);
+    const carried = parsePOHR(p.summary);
+    const ph = isPlaceholder(p.summary);
+    const resp = parsePOHR((/<summary>([\s\S]*?)<\/summary>/.exec(r.raw_output) || [])[1] || "");
+
+    const optChips = E()
+      .choices.map((o, i) => `<span class="opt-chip"><b>${letter(i)}</b> ${esc(o)}</span>`)
+      .join("");
+
+    const carriedInner = ph
+      ? `<div class="placeholder-note">Initialization placeholder &mdash; round&nbsp;1 carries <em>no real summary</em> yet.</div>`
+      : pohrBlock(carried, true);
+
+    const promptCard = `
+      <div class="turn turn-user">
+        <div class="turn-head"><span class="turn-who who-prompt">Prompt</span> what the agent receives this round</div>
+        ${field("Question &amp; options", `<div class="pfield-q">${esc(p.q)}</div><div class="opt-chips">${optChips}</div>`)}
+        ${field(
+          "Frame budget",
+          `<div class="budget-row">
+             <span class="kv"><span class="kv-k">total</span> L = ${p.L || "?"}</span>
+             <span class="kv"><span class="kv-k">seen</span> ${esc(p.seen) || "&mdash;"}</span>
+           </div>
+           <div class="ranges"><span class="kv-k">may request from</span> ${esc(p.ranges)}</div>`
+        )}
+        ${field("Current summary <span class='pfield-sub'>(carried state)</span>", carriedInner)}
+        ${field("Frames shown this round", framesRow(r.current_frames))}
+        <details class="raw-toggle"><summary>Show raw prompt text</summary><pre class="raw-block">${esc(r.user_text)}</pre></details>
+      </div>`;
+
+    const responseCard = `
+      <div class="turn turn-agent">
+        <div class="turn-head"><span class="turn-who who-agent">ReViSe</span> the model's response</div>
+        ${field("Updated summary <span class='pfield-sub'>(POHR &mdash; the model's reasoning)</span>", pohrBlock(resp, false))}
+        ${actionFromRaw(r.raw_output)}
+        <details class="raw-toggle"><summary>Show raw response</summary><pre class="raw-block">${esc(r.raw_output)}</pre></details>
+      </div>`;
+
     return `<div class="qual-round${view === idx ? " is-current" : ""}">
         <div class="round-label">Round ${idx + 1}${isFinal ? " &middot; answers" : ""}</div>
-
-        <div class="turn turn-user">
-          <div class="turn-head"><span class="turn-who who-prompt">Prompt</span> complete user message sent this round</div>
-          <pre class="raw-block">${esc(r.user_text)}</pre>
-          <div class="turn-sub">Frames shown this round (the <code>&lt;image&gt;</code> tokens above):</div>
-          ${framesRow(r.current_frames)}
-        </div>
-
-        <div class="turn turn-agent">
-          <div class="turn-head"><span class="turn-who who-agent">ReViSe</span> complete raw response</div>
-          <pre class="raw-block">${esc(r.raw_output)}</pre>
-          <div class="turn-sub">Parsed POHR summary (the model's reasoning):</div>
-          ${pohrBlock(pohr)}
-        </div>
+        ${promptCard}
+        ${responseCard}
       </div>`;
   }
 
-  function shownRounds() {
-    return view === "all" ? E().rounds.map((_, i) => i) : [view];
-  }
+  const shownRounds = () => (view === "all" ? E().rounds.map((_, i) => i) : [view]);
 
   function render() {
     const ex = E();
@@ -121,10 +170,7 @@ const KEYS = ["P", "O", "H", "U", "R"];
     const maxShown = idxs[idxs.length - 1];
     const showAnswer = idxs.includes(lastIdx());
 
-    Array.from(elTabs.children).forEach((t) => {
-      const v = t.dataset.view;
-      t.classList.toggle("is-active", v === String(view));
-    });
+    Array.from(elTabs.children).forEach((t) => t.classList.toggle("is-active", t.dataset.view === String(view)));
     elBar.style.width = view === "all" ? "100%" : `${((view + 1) / ex.rounds.length) * 100}%`;
     const seen = new Set();
     for (let i = 0; i <= maxShown; i++) ex.rounds[i].current_frames.forEach((f) => seen.add(f));
@@ -138,10 +184,7 @@ const KEYS = ["P", "O", "H", "U", "R"];
     }
   }
 
-  function setView(v) {
-    view = v;
-    render();
-  }
+  function setView(v) { view = v; render(); }
 
   function buildTabs() {
     const btns = [`<button class="qual-tab" type="button" data-view="all">Full conversation</button>`].concat(
@@ -149,11 +192,7 @@ const KEYS = ["P", "O", "H", "U", "R"];
     );
     elTabs.innerHTML = btns.join("");
     Array.from(elTabs.children).forEach((t) =>
-      t.addEventListener("click", () => {
-        stop();
-        const v = t.dataset.view;
-        setView(v === "all" ? "all" : parseInt(v, 10));
-      })
+      t.addEventListener("click", () => { stop(); const v = t.dataset.view; setView(v === "all" ? "all" : parseInt(v, 10)); })
     );
   }
 
