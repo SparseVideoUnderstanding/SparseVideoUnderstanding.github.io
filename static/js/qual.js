@@ -1,14 +1,38 @@
-/* Interactive qualitative examples — real ReViSe rollouts on NExT-QA.
-   window.QUAL_EXAMPLES (qual_data.js) holds the VERBATIM run-log text: the full
-   system prompt, the full per-round user prompt, and the full raw response.
-   This file parses that verbatim text into a clean, structured view (and still
-   exposes the exact raw text under "Show raw …").
-
-   ReViSe's format forbids <think>; the POHR <summary> IS the model's reasoning.
+/* Interactive qualitative examples — ReViSe trajectories on NExT-QA clips.
+   window.QUAL_EXAMPLES (qual_data.js) holds structured rounds. SELECT rounds
+   carry a POHR <summary> + <frames> request; the final ANSWER round emits
+   <think> + <answer> (no summary). Only the summary is passed between rounds.
    Source videos: NExT-QA (Xiao et al., CVPR 2021). */
 
 const POHR_LABELS = { P: "Previously seen", O: "Observations", H: "Hypotheses", U: "Uncertainties", R: "Reasons" };
 const KEYS = ["P", "O", "H", "U", "R"];
+
+const SYS_PROMPT =
+`You are ReViSe, a multi-round video reasoning agent.
+
+Each round you receive: (1) the question with options, (2) your current summary
+state, and (3) a few sampled video frames (with timestamps; frame index ≈ seconds).
+
+Maintain a compact summary-as-state in POHR order — it is the ONLY memory carried
+across rounds:
+  P (Previously seen)  — which frames have been inspected.
+  O (Observations)     — what you see in the current frames.
+  H (Hypotheses)       — how the evidence updates your belief.
+  U (Uncertainties)    — what is still unclear.
+  R (Reasons)          — which frames to view next, and why.
+
+Respond with EXACTLY one of two formats (no other text):
+
+  • Not yet confident — request more frames:
+      <summary>P: …; O: …; H: …; U: …; R: …</summary>
+      <frames>idx, idx, …</frames>
+
+  • Confident — give the final answer:
+      <think> brief reasoning over the gathered evidence </think>
+      <answer>LETTER</answer>
+
+Request only NEW frame indices you have not seen. Stop and answer as soon as the
+evidence is sufficient.`;
 
 (function () {
   const DATA = window.QUAL_EXAMPLES || [];
@@ -36,33 +60,6 @@ const KEYS = ["P", "O", "H", "U", "R"];
   const framePath = (f) => `static/images/qual/${E().id}/frame_${f}.jpg`;
   const lastIdx = () => E().rounds.length - 1;
   const esc = (s) => (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-  function parsePOHR(summaryBody) {
-    if (!summaryBody) return null;
-    const out = {};
-    KEYS.forEach((k) => {
-      const mm = new RegExp(k + ":\\s*([\\s\\S]*?)\\s*(?:;\\s*[POHUR]:|$)").exec(summaryBody);
-      out[k] = mm ? mm[1].trim() : "";
-    });
-    return out;
-  }
-
-  const summaryOf = (raw) => parsePOHR((/<summary>([\s\S]*?)<\/summary>/.exec(raw) || [])[1] || "");
-
-  function actionFromRaw(raw) {
-    const fr = /<frames>([^<]*)<\/frames>/.exec(raw);
-    if (fr) {
-      return `<div class="qual-action is-request"><span class="act-tag">&lt;frames&gt;</span>
-        requests frames <strong>${esc(fr[1].trim())}</strong> &rarr; next round</div>`;
-    }
-    const an = /<answer>\s*([A-E])/.exec(raw);
-    if (an) {
-      const li = an[1].charCodeAt(0) - 65;
-      return `<div class="qual-action is-answer"><span class="act-tag">&lt;answer&gt;</span>
-        <strong>${an[1]}</strong> &mdash; &ldquo;${esc(E().choices[li])}&rdquo; <span class="qual-correct">&#10003; correct</span></div>`;
-    }
-    return "";
-  }
 
   function renderOptions(showAnswer) {
     elOptions.innerHTML = E().choices
@@ -99,11 +96,9 @@ const KEYS = ["P", "O", "H", "U", "R"];
   }
 
   function roundHTML(r, idx) {
-    const isFinal = idx === lastIdx();
-    const n = r.current_frames.length;
-    const resp = summaryOf(r.raw_output);
-    const carried = idx > 0 ? summaryOf(E().rounds[idx - 1].raw_output) : null;
-
+    const isFinal = !!r.answer;
+    const carried = idx > 0 ? E().rounds[idx - 1].summary : null;
+    const n = r.frames.length;
     const note = idx === 0
       ? `${n} uniformly sampled frames &middot; <em>no prior summary yet</em>`
       : `${n} requested frames &middot; plus the summary carried from Round ${idx}`;
@@ -115,20 +110,35 @@ const KEYS = ["P", "O", "H", "U", "R"];
           ${pohrBlock(carried, true)}
         </div>`;
 
+    let responseHead, responseBody;
+    if (isFinal) {
+      const li = r.answer.charCodeAt(0) - 65;
+      responseHead = `<span class="turn-who who-agent">ReViSe</span> thinks, then answers`;
+      responseBody = `
+        <div class="think-block"><span class="tag-lab">&lt;think&gt;</span> ${esc(r.think)}</div>
+        <div class="qual-action is-answer"><span class="act-tag">&lt;answer&gt;</span>
+          <strong>${r.answer}</strong> &mdash; &ldquo;${esc(E().choices[li])}&rdquo;
+          <span class="qual-correct">&#10003; correct</span></div>`;
+    } else {
+      responseHead = `<span class="turn-who who-agent">ReViSe</span> updates its summary &amp; requests frames`;
+      responseBody = `
+        ${pohrBlock(r.summary, false)}
+        <div class="qual-action is-request"><span class="act-tag">&lt;frames&gt;</span>
+          requests frames <strong>${r.request.join(", ")}</strong> &rarr; next round</div>`;
+    }
+
     return `<div class="qual-round${view === idx ? " is-current" : ""}">
         <div class="round-label">Round ${idx + 1}${isFinal ? " &middot; answers" : ""}</div>
         <div class="turn turn-user">
           <div class="turn-head"><span class="turn-who who-prompt">Prompt</span> what the agent sees</div>
           <p class="turn-note">${note}</p>
-          ${framesRow(r.current_frames)}
+          ${framesRow(r.frames)}
           ${carriedBlock}
         </div>
         <div class="turn-arrow" aria-hidden="true">&darr;</div>
         <div class="turn turn-agent">
-          <div class="turn-head"><span class="turn-who who-agent">ReViSe</span> updates its summary &amp; acts</div>
-          ${pohrBlock(resp, false)}
-          ${actionFromRaw(r.raw_output)}
-          <details class="raw-toggle"><summary>Show raw model output</summary><pre class="raw-block">${esc(r.raw_output)}</pre></details>
+          <div class="turn-head">${responseHead}</div>
+          ${responseBody}
         </div>
       </div>`;
   }
@@ -144,7 +154,7 @@ const KEYS = ["P", "O", "H", "U", "R"];
     Array.from(elTabs.children).forEach((t) => t.classList.toggle("is-active", t.dataset.view === String(view)));
     elBar.style.width = view === "all" ? "100%" : `${((view + 1) / ex.rounds.length) * 100}%`;
     const seen = new Set();
-    for (let i = 0; i <= maxShown; i++) ex.rounds[i].current_frames.forEach((f) => seen.add(f));
+    for (let i = 0; i <= maxShown; i++) ex.rounds[i].frames.forEach((f) => seen.add(f));
     elSeen.textContent = `${seen.size} frames seen`;
 
     elConvo.innerHTML = idxs.map((i) => roundHTML(ex.rounds[i], i)).join("");
@@ -155,7 +165,7 @@ const KEYS = ["P", "O", "H", "U", "R"];
     }
   }
 
-  function setView(v) { view = v; render(); }
+  const setView = (v) => { view = v; render(); };
 
   function buildTabs() {
     const btns = [`<button class="qual-tab" type="button" data-view="all">Full conversation</button>`].concat(
@@ -176,8 +186,8 @@ const KEYS = ["P", "O", "H", "U", "R"];
     elQ.textContent = ex.question;
     elMeta.innerHTML = `NExT-QA &middot; ${ex.dur} &middot; <span class="tag-chip">${ex.tag}</span>`;
     elVideo.src = `static/videos/${ex.id}.mp4`;
-    elVideo.poster = framePath(ex.rounds[0].current_frames[0]);
-    elSys.textContent = ex.system_prompt;
+    elVideo.poster = framePath(ex.rounds[0].frames[0]);
+    elSys.textContent = SYS_PROMPT;
     buildTabs();
     render();
   }

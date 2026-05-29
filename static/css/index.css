@@ -664,6 +664,26 @@ body {
 .raw-toggle summary:hover { color: #d24d3f; }
 .raw-toggle .raw-block { margin-top: 0.5rem; }
 
+/* answer-round <think> block */
+.think-block {
+  background: #eef4fb;
+  border: 1px solid #d3e2f2;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #27405e;
+  margin: 0.2rem 0 0.55rem;
+}
+
+.tag-lab {
+  font-family: "SFMono-Regular", Menlo, monospace;
+  font-weight: 700;
+  color: #2563a8;
+  opacity: 0.85;
+  margin-right: 0.3rem;
+}
+
 .qual-credit {
   max-width: 820px;
   margin: 1.1rem auto 0;

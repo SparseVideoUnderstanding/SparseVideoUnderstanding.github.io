@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=20260529f">
+  <link rel="stylesheet" href="static/css/index.css?v=20260529g">
 </head>
 <body>
 
@@ -176,11 +176,11 @@
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered section-title">Qualitative Example</h2>
     <p class="has-text-centered qual-sub">
-      <strong>Real ReViSe rollouts</strong> on NExT-QA &mdash; the actual per-round conversation.
-      Each round the agent receives a few frames plus its carried summary, then emits an updated
-      summary and either requests more frames or answers. Pick an example, watch the original clip,
-      and step through the rounds. Note that <strong>only the summary is passed between rounds</strong>
-      &mdash; never raw frames.
+<strong>ReViSe trajectories</strong> on NExT-QA clips. Each round the agent sees a few frames plus
+      its carried summary, then either updates the summary and requests more frames, or &mdash; on the
+      final round &mdash; gives a brief <code>&lt;think&gt;</code> and the <code>&lt;answer&gt;</code>.
+      Pick an example, watch the original clip, and step through the rounds;
+      <strong>only the summary is carried between rounds</strong>.
     </p>
 
     <!-- example switcher -->
@@ -301,7 +301,7 @@
   </div>
 </footer>
 
-<script src="static/js/qual_data.js?v=20260529f"></script>
-<script src="static/js/qual.js?v=20260529f"></script>
+<script src="static/js/qual_data.js?v=20260529g"></script>
+<script src="static/js/qual.js?v=20260529g"></script>
 </body>
 </html>
