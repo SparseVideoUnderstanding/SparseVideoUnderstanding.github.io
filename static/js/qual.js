@@ -1,147 +1,21 @@
 /* Interactive qualitative examples — real ReViSe rollouts on NExT-QA.
-   Every round below is transcribed verbatim from the run log: the prompt the
-   agent received (frames + the summary carried as state) and its literal output
-   (<summary> + <frames>/<answer>). Round 1 has NO prior summary. Frames are the
-   exact ones the agent saw; the original clip is shown alongside.
-   Source videos: NExT-QA dataset (Xiao et al., CVPR 2021). */
+   Data (window.QUAL_EXAMPLES, see qual_data.js) is transcribed VERBATIM from the
+   run log: the complete system prompt, the complete per-round user prompt, and
+   the complete raw model response. Nothing is paraphrased.
 
-const EXAMPLES = [
-  {
-    id: "8608712348",
-    label: "Baby's smile",
-    tag: "Social",
-    fps: 24,
-    dur: "24 s",
-    question:
-      "How did the lady holding the baby react when the baby smiles happily in the middle of the video?",
-    options: [
-      "bounce ball while carrying baby",
-      "rolled eyes",
-      "laugh",
-      "smile and look at baby",
-      "rocks him left and right"
-    ],
-    answerIdx: 3,
-    rounds: [
-      {
-        shown: [0, 146, 292, 438, 584],
-        shownNote: "5 uniformly sampled frames",
-        carried: null,
-        summary: {
-          P: "previously seen frames show different scenes involving children and adults, including a baby being held by a lady",
-          O: "I observe a baby smiling happily in frame 292, but the lady's reaction is not clearly visible",
-          H: "my belief is updated but still incomplete regarding the lady's reaction",
-          U: "a key detail is still unclear — the lady's reaction when the baby smiles",
-          R: "request additional frames to gather the missing evidence"
-        },
-        action: { type: "request", frames: [293, 342, 391] }
-      },
-      {
-        shown: [293, 342, 391],
-        shownNote: "3 frames the agent requested",
-        carried: 0,
-        summary: {
-          P: "previously seen frames show different scenes involving children and adults, including a baby being held by a lady",
-          O: "I observe the lady smiling and looking at the baby in frame 342 when the baby is smiling happily",
-          H: "my belief is updated to include the lady's reaction when the baby smiles",
-          U: "there is no remaining ambiguity that affects the answer",
-          R: "answered"
-        },
-        action: { type: "answer", letter: "D" }
-      }
-    ]
-  },
-  {
-    id: "9645028313",
-    label: "Where to cut",
-    tag: "Action",
-    fps: 25,
-    dur: "77 s",
-    question:
-      "How does the man in the yellow helmet signal the man in the orange helmet where to cut?",
-    options: [
-      "point it out",
-      "using the white paper",
-      "use his hands to show him the way",
-      "he ran",
-      "talking while moving backwards"
-    ],
-    answerIdx: 0,
-    rounds: [
-      {
-        shown: [0, 483, 966, 1448, 1931],
-        shownNote: "5 uniformly sampled frames",
-        carried: null,
-        summary: {
-          P: "previously seen frames show two men working on a roof, one in a yellow helmet and the other in an orange helmet",
-          O: "I observe both men engaged in tasks involving tools, but their interaction isn't clear",
-          H: "my belief is updated but still incomplete regarding how they communicate",
-          U: "it is unclear how the man in the yellow helmet signals the man in the orange helmet",
-          R: "request additional frames to gather the missing evidence"
-        },
-        action: { type: "request", frames: [242, 729, 1215] }
-      },
-      {
-        shown: [242, 729, 1215],
-        shownNote: "3 frames the agent requested",
-        carried: 0,
-        summary: {
-          P: "previously seen frames show two men working on a roof, one in a yellow helmet and the other in an orange helmet",
-          O: "I observe the man in the yellow helmet pointing towards the roof while the man in the orange helmet looks in that direction",
-          H: "my belief is updated to suggest the man in the yellow helmet uses gestures to communicate",
-          U: "it is still unclear if there are other methods of communication being used",
-          R: "answered"
-        },
-        action: { type: "answer", letter: "A" }
-      }
-    ]
-  },
-  {
-    id: "4519255731",
-    label: "Water wheel",
-    tag: "Purpose",
-    fps: 24,
-    dur: "41 s",
-    question: "Why are the kids rotating the water wheel?",
-    options: ["move the water", "catch fish", "boy cannot control hose itself", "dancing", "to not fall off"],
-    answerIdx: 0,
-    rounds: [
-      {
-        shown: [0, 246, 492, 737, 983],
-        shownNote: "5 uniformly sampled frames",
-        carried: null,
-        summary: {
-          P: "previously seen frames show children and adults interacting with a water wheel mechanism",
-          O: "I observe the kids actively turning the wheel while adults assist them",
-          H: "my belief is updated to suggest the activity involves moving water",
-          U: "it is unclear if there are other purposes for their actions beyond moving water",
-          R: "request additional frames to gather the missing evidence"
-        },
-        action: { type: "request", frames: [123, 365, 607] }
-      },
-      {
-        shown: [123, 365, 607],
-        shownNote: "3 frames the agent requested",
-        carried: 0,
-        summary: {
-          P: "previously seen frames show children and adults interacting with a water wheel mechanism",
-          O: "I observe the kids actively turning the wheel, and water is visibly being moved by the wheel",
-          H: "my belief is updated to suggest the primary purpose is moving water",
-          U: "it is still unclear if there are secondary purposes for their actions",
-          R: "answered"
-        },
-        action: { type: "answer", letter: "A" }
-      }
-    ]
-  }
-];
+   Note on "thinking": ReViSe's output format forbids <think> — the model emits
+   ONLY <summary>...</summary> followed by <frames> or <answer>. The POHR summary
+   IS the model's reasoning; there is no separate hidden chain of thought.
+
+   Source videos: NExT-QA (Xiao et al., CVPR 2021). */
 
 const POHR_LABELS = { P: "Previously seen", O: "Observations", H: "Hypotheses", U: "Uncertainties", R: "Reasons" };
 const KEYS = ["P", "O", "H", "U", "R"];
 
 (function () {
+  const DATA = window.QUAL_EXAMPLES || [];
   let curEx = 0;
-  let cur = 0;
+  let view = "all"; // "all" or 0-based round index
   let timer = null;
 
   const el = (id) => document.getElementById(id);
@@ -150,24 +24,43 @@ const KEYS = ["P", "O", "H", "U", "R"];
   const elQ = el("qualQ");
   const elMeta = el("qualMeta");
   const elOptions = el("qualOptions");
+  const elSys = el("qualSys");
   const elTabs = el("qualTabs");
   const elConvo = el("qualConvo");
   const elSeen = el("qualSeen");
   const elBar = el("qualBar");
   const playBtn = el("qualPlay");
-  if (!elConvo || !elExamples) return;
+  if (!elConvo || !elExamples || !DATA.length) return;
 
-  const E = () => EXAMPLES[curEx];
+  const E = () => DATA[curEx];
   const letter = (i) => String.fromCharCode(65 + i);
   const tstamp = (f) => (f / E().fps).toFixed(1);
   const framePath = (f) => `static/images/qual/${E().id}/frame_${f}.jpg`;
+  const lastIdx = () => E().rounds.length - 1;
+
+  function esc(s) {
+    return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function parsePOHR(raw) {
+    const m = /<summary>([\s\S]*?)<\/summary>/.exec(raw || "");
+    if (!m) return null;
+    const body = m[1];
+    const out = {};
+    KEYS.forEach((k) => {
+      const rx = new RegExp(k + ":\\s*([\\s\\S]*?)\\s*(?:;\\s*[POHUR]:|$)");
+      const mm = rx.exec(body);
+      out[k] = mm ? mm[1].trim() : "";
+    });
+    return out;
+  }
 
   function renderOptions(showAnswer) {
-    elOptions.innerHTML = E().options
+    elOptions.innerHTML = E().choices
       .map((opt, i) => {
         const isAns = showAnswer && i === E().answerIdx;
         return `<div class="qual-opt${isAns ? " is-answer" : ""}">
-            <span class="qual-opt-key">${letter(i)}</span><span>${opt}</span>
+            <span class="qual-opt-key">${letter(i)}</span><span>${esc(opt)}</span>
             ${isAns ? '<span class="qual-check">&#10003;</span>' : ""}
           </div>`;
       })
@@ -185,97 +78,98 @@ const KEYS = ["P", "O", "H", "U", "R"];
       .join("")}</div>`;
   }
 
-  function pohrBlock(sum, compact) {
-    return `<div class="pohr${compact ? " is-compact" : ""}">${KEYS.map(
+  function pohrBlock(sum) {
+    if (!sum) return "";
+    return `<div class="pohr">${KEYS.map(
       (k) => `<div class="pohr-row">
         <span class="pohr-badge pohr-${k}">${k}</span>
         <span class="pohr-label">${POHR_LABELS[k]}</span>
-        <span class="pohr-val">${sum[k]}</span>
+        <span class="pohr-val">${esc(sum[k])}</span>
       </div>`
     ).join("")}</div>`;
   }
 
-  function actionHTML(action) {
-    if (action.type === "answer") {
-      const li = action.letter.charCodeAt(0) - 65;
-      return `<div class="raw-tag is-answer">&lt;answer&gt;${action.letter}&lt;/answer&gt;
-        <span class="raw-gloss">&rarr; ${action.letter}. &ldquo;${E().options[li]}&rdquo; <span class="qual-correct">&#10003; correct</span></span></div>`;
-    }
-    return `<div class="raw-tag is-request">&lt;frames&gt;${action.frames.join(", ")}&lt;/frames&gt;
-      <span class="raw-gloss">&rarr; request these frames for the next round</span></div>`;
-  }
-
   function roundHTML(r, idx) {
-    const isFinal = r.action.type === "answer";
-    let promptInner = "";
-    if (idx === 0) {
-      promptInner += `<p class="turn-note">${r.shownNote} &middot; <em>first round &mdash; no prior summary</em></p>`;
-      promptInner += framesRow(r.shown);
-    } else {
-      promptInner += `<p class="turn-note">${r.shownNote}</p>`;
-      promptInner += framesRow(r.shown);
-      promptInner += `<div class="carried">
-          <div class="carried-head">Memory carried in &mdash; <em>Round ${idx}'s summary is the agent's only state</em></div>
-          ${pohrBlock(E().rounds[r.carried].summary, true)}
-        </div>`;
-    }
-    const responseInner = `
-      <div class="raw-tag">&lt;summary&gt;</div>
-      ${pohrBlock(r.summary, false)}
-      <div class="raw-tag">&lt;/summary&gt;</div>
-      ${actionHTML(r.action)}`;
-    return `<div class="qual-round${idx === cur ? " is-current" : ""}">
+    const isFinal = idx === lastIdx();
+    const pohr = parsePOHR(r.raw_output);
+    return `<div class="qual-round${view === idx ? " is-current" : ""}">
         <div class="round-label">Round ${idx + 1}${isFinal ? " &middot; answers" : ""}</div>
+
         <div class="turn turn-user">
-          <div class="turn-head"><span class="turn-who who-prompt">Prompt</span> frames + carried state</div>
-          ${promptInner}
+          <div class="turn-head"><span class="turn-who who-prompt">Prompt</span> complete user message sent this round</div>
+          <pre class="raw-block">${esc(r.user_text)}</pre>
+          <div class="turn-sub">Frames shown this round (the <code>&lt;image&gt;</code> tokens above):</div>
+          ${framesRow(r.current_frames)}
         </div>
+
         <div class="turn turn-agent">
-          <div class="turn-head"><span class="turn-who who-agent">ReViSe</span> summary &amp; action</div>
-          ${responseInner}
+          <div class="turn-head"><span class="turn-who who-agent">ReViSe</span> complete raw response</div>
+          <pre class="raw-block">${esc(r.raw_output)}</pre>
+          <div class="turn-sub">Parsed POHR summary (the model's reasoning):</div>
+          ${pohrBlock(pohr)}
         </div>
       </div>`;
   }
 
-  function cumulativeSeen(upto) {
-    const s = new Set();
-    for (let i = 0; i <= upto; i++) E().rounds[i].shown.forEach((f) => s.add(f));
-    return s.size;
+  function shownRounds() {
+    return view === "all" ? E().rounds.map((_, i) => i) : [view];
   }
 
-  function render(c) {
-    cur = c;
+  function render() {
     const ex = E();
-    const reachedFinal = ex.rounds[cur].action.type === "answer";
-    Array.from(elTabs.children).forEach((t, i) => t.classList.toggle("is-active", i === cur));
-    elBar.style.width = `${((cur + 1) / ex.rounds.length) * 100}%`;
-    elSeen.textContent = `${cumulativeSeen(cur)} frames seen`;
-    elConvo.innerHTML = ex.rounds.slice(0, cur + 1).map((r, i) => roundHTML(r, i)).join("");
-    renderOptions(reachedFinal);
-    const last = elConvo.querySelector(".qual-round.is-current");
-    if (last && cur > 0) last.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const idxs = shownRounds();
+    const maxShown = idxs[idxs.length - 1];
+    const showAnswer = idxs.includes(lastIdx());
+
+    Array.from(elTabs.children).forEach((t) => {
+      const v = t.dataset.view;
+      t.classList.toggle("is-active", v === String(view));
+    });
+    elBar.style.width = view === "all" ? "100%" : `${((view + 1) / ex.rounds.length) * 100}%`;
+    const seen = new Set();
+    for (let i = 0; i <= maxShown; i++) ex.rounds[i].current_frames.forEach((f) => seen.add(f));
+    elSeen.textContent = `${seen.size} frames seen`;
+
+    elConvo.innerHTML = idxs.map((i) => roundHTML(ex.rounds[i], i)).join("");
+    renderOptions(showAnswer);
+    if (view !== "all") {
+      const cur = elConvo.querySelector(".qual-round");
+      if (cur) cur.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+
+  function setView(v) {
+    view = v;
+    render();
   }
 
   function buildTabs() {
-    elTabs.innerHTML = E()
-      .rounds.map((r, i) => `<button class="qual-tab" type="button">Round ${i + 1}</button>`)
-      .join("");
-    Array.from(elTabs.children).forEach((t, i) =>
-      t.addEventListener("click", () => { stop(); render(i); })
+    const btns = [`<button class="qual-tab" type="button" data-view="all">Full conversation</button>`].concat(
+      E().rounds.map((r, i) => `<button class="qual-tab" type="button" data-view="${i}">Round ${i + 1}</button>`)
+    );
+    elTabs.innerHTML = btns.join("");
+    Array.from(elTabs.children).forEach((t) =>
+      t.addEventListener("click", () => {
+        stop();
+        const v = t.dataset.view;
+        setView(v === "all" ? "all" : parseInt(v, 10));
+      })
     );
   }
 
   function selectExample(i) {
     stop();
     curEx = i;
+    view = "all";
     const ex = E();
     Array.from(elExamples.children).forEach((b, j) => b.classList.toggle("is-active", j === i));
     elQ.textContent = ex.question;
     elMeta.innerHTML = `NExT-QA &middot; ${ex.dur} &middot; <span class="tag-chip">${ex.tag}</span>`;
     elVideo.src = `static/videos/${ex.id}.mp4`;
-    elVideo.poster = framePath(ex.rounds[0].shown[0]);
+    elVideo.poster = framePath(ex.rounds[0].current_frames[0]);
+    elSys.textContent = ex.system_prompt;
     buildTabs();
-    render(0);
+    render();
   }
 
   function stop() {
@@ -285,20 +179,18 @@ const KEYS = ["P", "O", "H", "U", "R"];
   }
   function play() {
     if (timer) { stop(); return; }
-    if (cur === E().rounds.length - 1) render(0);
+    setView(0);
     playBtn.innerHTML = "&#9632; Pause";
     playBtn.classList.add("is-playing");
     timer = setInterval(() => {
-      if (cur >= E().rounds.length - 1) { stop(); return; }
-      render(cur + 1);
-    }, 3200);
+      if (view === "all" || view >= lastIdx()) { stop(); return; }
+      setView(view + 1);
+    }, 3400);
   }
 
-  // build example switcher
-  elExamples.innerHTML = EXAMPLES.map(
-    (ex, i) => `<button class="qual-ex" type="button">
-        <span class="qual-ex-tag">${ex.tag}</span>${ex.label}
-      </button>`
+  elExamples.innerHTML = DATA.map(
+    (ex) => `<button class="qual-ex" type="button"><span class="qual-ex-tag">${ex.tag}</span>${ex.label}
+        <span class="qual-ex-rounds">${ex.rounds.length} rounds</span></button>`
   ).join("");
   Array.from(elExamples.children).forEach((b, i) => b.addEventListener("click", () => selectExample(i)));
 

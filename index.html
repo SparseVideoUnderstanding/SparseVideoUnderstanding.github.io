@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=20260529c">
+  <link rel="stylesheet" href="static/css/index.css?v=20260529d">
 </head>
 <body>
 
@@ -202,8 +202,13 @@
         </div>
       </div>
 
+      <details class="qual-sys-wrap">
+        <summary>Show the full system prompt <span class="qual-sys-note">(identical every round)</span></summary>
+        <pre class="raw-block" id="qualSys"></pre>
+      </details>
+
       <div class="qual-controls">
-        <span class="qual-controls-label">Conversation</span>
+        <span class="qual-controls-label">View</span>
         <span class="qual-tabs" id="qualTabs"></span>
         <span class="qual-seen" id="qualSeen"></span>
         <button class="qual-play" id="qualPlay" type="button">&#9654; Play rounds</button>
@@ -312,6 +317,7 @@
   </div>
 </footer>
 
-<script src="static/js/qual.js?v=20260529c"></script>
+<script src="static/js/qual_data.js?v=20260529d"></script>
+<script src="static/js/qual.js?v=20260529d"></script>
 </body>
 </html>

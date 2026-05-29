@@ -546,7 +546,51 @@ body {
   color: #888;
 }
 
-.qual-tabs { display: inline-flex; gap: 0.4rem; }
+.qual-tabs { display: inline-flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.qual-ex-rounds {
+  font-size: 0.64rem;
+  font-weight: 700;
+  opacity: 0.7;
+  margin-left: 0.15rem;
+}
+
+/* verbatim prompt/response blocks */
+.raw-block {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #f4f5f7;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  margin: 0.2rem 0 0.3rem;
+  color: #333;
+  overflow-x: auto;
+}
+
+.turn-agent .raw-block { background: #fbf3f1; border-color: #ecd9d4; }
+
+.turn-sub {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #888;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.qual-sys-wrap {
+  margin: 0 0 1.1rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  background: #fafafa;
+  padding: 0.5rem 0.8rem;
+}
+
+.qual-sys-wrap summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; color: #555; }
+.qual-sys-note { font-weight: 400; color: #999; font-size: 0.82rem; }
+.qual-sys-wrap .raw-block { margin-top: 0.7rem; max-height: 340px; overflow: auto; }
 
 .qual-credit {
   max-width: 820px;
