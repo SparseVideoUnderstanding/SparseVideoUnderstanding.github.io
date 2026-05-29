@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>REVISE: Reasoning with Video Sparsity</title>
-  <meta name="description" content="REVISE — a multi-round agent for question-aware sparse video understanding. It selects a few informative frames, keeps a compact summary-as-state, and stops early when confident.">
+  <title>ReViSe: Reasoning with Video Sparsity</title>
+  <meta name="description" content="ReViSe — a multi-round agent for question-aware sparse video understanding. It selects a few informative frames, keeps a compact summary-as-state, and stops early when confident.">
 
-  <meta property="og:title" content="REVISE: Towards Sparse Video Understanding and Reasoning">
+  <meta property="og:title" content="ReViSe: Towards Sparse Video Understanding and Reasoning">
   <meta property="og:description" content="A multi-round agent that selects informative frames, maintains a summary-as-state, and stops early when confident.">
   <meta property="og:image" content="static/images/overview.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -24,7 +24,7 @@
         Towards Sparse Video Understanding and Reasoning
       </h1>
       <p class="subtitle is-4" style="margin-top:0.75rem;">
-        <span class="revise-mark">REVISE</span> &mdash; <em>Reasoning with Video Sparsity</em>
+        <span class="revise-mark">ReViSe</span> &mdash; <em>Reasoning with Video Sparsity</em>
       </p>
 
       <div class="publication-authors">
@@ -50,7 +50,7 @@
 
       <div class="link-buttons">
         <!-- arXiv (placeholder link — update once posted) -->
-        <a class="link-button" href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank" rel="noopener">
+        <a class="link-button" href="https://arxiv.org/abs/2602.13602" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v2H3V4zm0 5h18v2H3V9zm0 5h12v2H3v-2zm0 5h18v2H3v-2z"/></svg>
           arXiv
         </a>
@@ -58,6 +58,11 @@
         <a class="link-button" href="https://github.com/Chenwei-1999/Sparse_Video_Understanding" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.16-.02-2.1-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 2.9-.39c.98 0 1.97.13 2.9.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.68.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5z"/></svg>
           Code
+        </a>
+        <!-- Video (paper walkthrough) -->
+        <a class="link-button" href="https://www.youtube.com/watch?v=EPhPuTWvg7Y&t=2s" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12c0 1.95.16 3.9.5 5.8a3.02 3.02 0 0 0 2.12 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14c.34-1.9.5-3.85.5-5.8s-.16-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+          Video
         </a>
       </div>
     </div>
@@ -69,9 +74,9 @@
   <div class="container is-max-desktop content-narrow">
     <h2 class="title is-3 has-text-centered section-title">Abstract</h2>
     <p class="abstract-text">
-      We present <span class="revise-mark">REVISE</span>
+      We present <span class="revise-mark">ReViSe</span>
       (<u>Re</u>asoning with <u>Vi</u>deo <u>S</u>parsity), a multi-round agent for video
-      question answering (VQA). Instead of uniformly sampling frames, REVISE selects a small set
+      question answering (VQA). Instead of uniformly sampling frames, ReViSe selects a small set
       of informative frames, maintains a <strong>summary-as-state</strong> across rounds, and
       stops early when confident. It supports proprietary vision-language models (VLMs) in a
       &ldquo;plug-and-play&rdquo; setting and enables reinforcement fine-tuning for open-source
@@ -81,10 +86,27 @@
       log-odds gap between the correct option and the strongest alternative;
       (2)&nbsp;<em>Summary sufficiency</em>: at answer time we re-ask using only the last committed
       summary and reward success; (3)&nbsp;<em>Correct-and-early stop</em>: answering correctly
-      within a small turn budget is rewarded. Across multiple VQA benchmarks, REVISE improves
+      within a small turn budget is rewarded. Across multiple VQA benchmarks, ReViSe improves
       accuracy while reducing frames, rounds, and prompt tokens, demonstrating practical sparse
       video reasoning.
     </p>
+  </div>
+</section>
+
+<!-- ===================== VIDEO ===================== -->
+<section class="section section-tint" id="video">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered section-title">Video</h2>
+    <p class="has-text-centered qual-sub" style="margin-bottom:1.3rem;">
+      A walkthrough of the method, the summary-as-state loop, and the EAGER reward.
+    </p>
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/EPhPuTWvg7Y?start=2"
+              title="ReViSe paper walkthrough"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen></iframe>
+    </div>
   </div>
 </section>
 
@@ -96,7 +118,7 @@
     <div class="content-narrow">
       <h3 class="title is-4">Summary-as-State</h3>
       <p>
-        REVISE operates analogously to a recurrent neural network: it maintains a compact state
+        ReViSe operates analogously to a recurrent neural network: it maintains a compact state
         that propagates information from previous rounds to the VLM, <strong>without re-admitting
         raw frames or conversation history</strong>. This is the load-bearing design choice that
         keeps the context compact even as evidence accumulates.
@@ -131,9 +153,9 @@
     </div>
 
     <div class="figure-block">
-      <img src="static/images/overview.png" alt="REVISE multi-round pipeline overview">
+      <img src="static/images/overview.png" alt="ReViSe multi-round pipeline overview">
       <p class="figure-caption">
-        The REVISE agent loop: sample frames &rarr; update the POHR summary &rarr; request targeted
+        The ReViSe agent loop: sample frames &rarr; update the POHR summary &rarr; request targeted
         frames or commit an answer.
       </p>
     </div>
@@ -166,17 +188,40 @@
   </div>
 </section>
 
-<!-- ===================== QUALITATIVE EXAMPLE ===================== -->
-<section class="section">
+<!-- ===================== QUALITATIVE EXAMPLE (interactive) ===================== -->
+<section class="section" id="example">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered section-title">Qualitative Example</h2>
-    <div class="figure-block">
-      <img src="static/images/sketch.png" alt="Qualitative example of the REVISE agent loop">
-      <p class="figure-caption">
-        The agent starts with 3 uniformly sampled frames, updates its POHR summary, identifies an
-        uncertainty, requests targeted frames, and arrives at the answer &mdash; all within
-        <strong>2 rounds using only 6 frames</strong> from a 15-second video.
-      </p>
+    <p class="has-text-centered qual-sub">
+      A <strong>real ReViSe rollout</strong> on NExT-QA &mdash; step through the rounds to watch the
+      agent gather evidence, update its summary, and stop once it is confident. Frames are the
+      actual ones the agent selected each round.
+    </p>
+
+    <div class="qual-card">
+      <div class="qual-question">
+        <span class="qual-q-label">Q</span>
+        <span>How does the girl deliver the food on the table to her mouth at the end?
+          <span class="qual-meta-chip" id="qualMeta">NExT-QA &middot; 42&nbsp;s clip</span>
+        </span>
+      </div>
+
+      <div class="qual-options" id="qualOptions"></div>
+
+      <div class="qual-controls">
+        <button class="qual-tab" type="button">Round 1</button>
+        <button class="qual-tab" type="button">Round 2</button>
+        <button class="qual-tab" type="button">Round 3</button>
+        <span class="qual-seen" id="qualSeen"></span>
+        <button class="qual-play" id="qualPlay" type="button">&#9654; Play</button>
+      </div>
+
+      <div class="qual-progress"><div class="qual-progress-bar" id="qualBar"></div></div>
+
+      <p class="qual-note" id="qualNote"></p>
+      <div class="qual-frames" id="qualFrames"></div>
+      <div class="qual-pohr" id="qualPohr"></div>
+      <div class="qual-action" id="qualAction"></div>
     </div>
   </div>
 </section>
@@ -197,10 +242,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td>VideoEspresso</td><td>GPT-4o + REVISE</td><td>48.9%</td><td>8.0</td></tr>
-          <tr><td>NExT-QA</td><td>GPT-4o + REVISE</td><td>63.8%</td><td>8.4</td></tr>
-          <tr><td>EgoSchema</td><td>GPT-4o + REVISE</td><td>60.6%</td><td>9.8</td></tr>
-          <tr class="highlight-row"><td>NExT-QA</td><td>Qwen2.5-VL-3B + REVISE + RL</td><td>51.3%</td><td>3.9</td></tr>
+          <tr><td>VideoEspresso</td><td>GPT-4o + ReViSe</td><td>48.9%</td><td>8.0</td></tr>
+          <tr><td>NExT-QA</td><td>GPT-4o + ReViSe</td><td>63.8%</td><td>8.4</td></tr>
+          <tr><td>EgoSchema</td><td>GPT-4o + ReViSe</td><td>60.6%</td><td>9.8</td></tr>
+          <tr class="highlight-row"><td>NExT-QA</td><td>Qwen2.5-VL-3B + ReViSe + RL</td><td>51.3%</td><td>3.9</td></tr>
         </tbody>
       </table>
 
@@ -239,7 +284,7 @@
 <footer class="footer">
   <div class="container has-text-centered">
     <p>
-      &copy; 2026 The REVISE Authors. Code released under the repository
+      &copy; 2026 The ReViSe Authors. Code released under the repository
       <a href="https://github.com/Chenwei-1999/Sparse_Video_Understanding" target="_blank" rel="noopener">LICENSE</a>.
     </p>
     <p style="margin-top:0.4rem;">
@@ -250,5 +295,6 @@
   </div>
 </footer>
 
+<script src="static/js/qual.js"></script>
 </body>
 </html>
