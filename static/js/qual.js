@@ -47,20 +47,7 @@ const KEYS = ["P", "O", "H", "U", "R"];
     return out;
   }
 
-  // pull structured pieces out of the verbatim user prompt
-  function parsePrompt(t) {
-    const grab = (re) => { const m = re.exec(t); return m ? m[1].trim() : ""; };
-    const sm = /Current summary:\s*<summary>([\s\S]*?)<\/summary>/.exec(t);
-    return {
-      q: grab(/Question:\s*([^\n]*)/),
-      instr: grab(/To answer, output\s*([^\n]*)/),
-      L: grab(/Total frames L\s*=\s*(\d+)/),
-      seen: grab(/Seen frames[^:]*:\s*([^\n]*)/),
-      ranges: grab(/Allowed unseen frame ranges[^:]*:\s*([^\n]*)/),
-      summary: sm ? sm[1].trim() : ""
-    };
-  }
-  const isPlaceholder = (s) => /I will summarize|I will record|I will update|request more evidence if needed/.test(s);
+  const summaryOf = (raw) => parsePOHR((/<summary>([\s\S]*?)<\/summary>/.exec(raw) || [])[1] || "");
 
   function actionFromRaw(raw) {
     const fr = /<frames>([^<]*)<\/frames>/.exec(raw);
@@ -111,54 +98,38 @@ const KEYS = ["P", "O", "H", "U", "R"];
     ).join("")}</div>`;
   }
 
-  function field(title, inner) {
-    return `<div class="pfield"><div class="pfield-h">${title}</div>${inner}</div>`;
-  }
-
   function roundHTML(r, idx) {
     const isFinal = idx === lastIdx();
-    const p = parsePrompt(r.user_text);
-    const carried = parsePOHR(p.summary);
-    const ph = isPlaceholder(p.summary);
-    const resp = parsePOHR((/<summary>([\s\S]*?)<\/summary>/.exec(r.raw_output) || [])[1] || "");
+    const n = r.current_frames.length;
+    const resp = summaryOf(r.raw_output);
+    const carried = idx > 0 ? summaryOf(E().rounds[idx - 1].raw_output) : null;
 
-    const optChips = E()
-      .choices.map((o, i) => `<span class="opt-chip"><b>${letter(i)}</b> ${esc(o)}</span>`)
-      .join("");
+    const note = idx === 0
+      ? `${n} uniformly sampled frames &middot; <em>no prior summary yet</em>`
+      : `${n} requested frames &middot; plus the summary carried from Round ${idx}`;
 
-    const carriedInner = ph
-      ? `<div class="placeholder-note">Initialization placeholder &mdash; round&nbsp;1 carries <em>no real summary</em> yet.</div>`
-      : pohrBlock(carried, true);
-
-    const promptCard = `
-      <div class="turn turn-user">
-        <div class="turn-head"><span class="turn-who who-prompt">Prompt</span> what the agent receives this round</div>
-        ${field("Question &amp; options", `<div class="pfield-q">${esc(p.q)}</div><div class="opt-chips">${optChips}</div>`)}
-        ${field(
-          "Frame budget",
-          `<div class="budget-row">
-             <span class="kv"><span class="kv-k">total</span> L = ${p.L || "?"}</span>
-             <span class="kv"><span class="kv-k">seen</span> ${esc(p.seen) || "&mdash;"}</span>
-           </div>
-           <div class="ranges"><span class="kv-k">may request from</span> ${esc(p.ranges)}</div>`
-        )}
-        ${field("Current summary <span class='pfield-sub'>(carried state)</span>", carriedInner)}
-        ${field("Frames shown this round", framesRow(r.current_frames))}
-        <details class="raw-toggle"><summary>Show raw prompt text</summary><pre class="raw-block">${esc(r.user_text)}</pre></details>
-      </div>`;
-
-    const responseCard = `
-      <div class="turn turn-agent">
-        <div class="turn-head"><span class="turn-who who-agent">ReViSe</span> the model's response</div>
-        ${field("Updated summary <span class='pfield-sub'>(POHR &mdash; the model's reasoning)</span>", pohrBlock(resp, false))}
-        ${actionFromRaw(r.raw_output)}
-        <details class="raw-toggle"><summary>Show raw response</summary><pre class="raw-block">${esc(r.raw_output)}</pre></details>
-      </div>`;
+    const carriedBlock = idx === 0
+      ? ""
+      : `<div class="carried">
+          <div class="carried-head">Carried summary <span class="pfield-sub">&mdash; the only state passed in</span></div>
+          ${pohrBlock(carried, true)}
+        </div>`;
 
     return `<div class="qual-round${view === idx ? " is-current" : ""}">
         <div class="round-label">Round ${idx + 1}${isFinal ? " &middot; answers" : ""}</div>
-        ${promptCard}
-        ${responseCard}
+        <div class="turn turn-user">
+          <div class="turn-head"><span class="turn-who who-prompt">Prompt</span> what the agent sees</div>
+          <p class="turn-note">${note}</p>
+          ${framesRow(r.current_frames)}
+          ${carriedBlock}
+        </div>
+        <div class="turn-arrow" aria-hidden="true">&darr;</div>
+        <div class="turn turn-agent">
+          <div class="turn-head"><span class="turn-who who-agent">ReViSe</span> updates its summary &amp; acts</div>
+          ${pohrBlock(resp, false)}
+          ${actionFromRaw(r.raw_output)}
+          <details class="raw-toggle"><summary>Show raw model output</summary><pre class="raw-block">${esc(r.raw_output)}</pre></details>
+        </div>
       </div>`;
   }
 
