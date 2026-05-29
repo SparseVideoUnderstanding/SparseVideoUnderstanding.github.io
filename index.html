@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=20260529h">
+  <link rel="stylesheet" href="static/css/index.css?v=20260529i">
 </head>
 <body>
 
@@ -115,7 +115,9 @@
     <div class="content-narrow">
       <p>
         Each round, the agent receives sampled video frames, the question, and its current summary
-        state. It produces a structured summary using the <strong>POHR</strong> format:
+        state. Every response begins with a transient <code>&lt;think&gt;</code> reasoning trace,
+        then commits a structured summary in the <strong>POHR</strong> format inside
+        <code>&lt;summarize&gt;</code>:
       </p>
 
       <table class="table is-fullwidth pohr-table">
@@ -129,14 +131,16 @@
       </table>
 
       <p>
-        The agent then either requests more frames (<code>&lt;frames&gt;</code>) or produces a
-        final answer (<code>&lt;answer&gt;</code>). Only the summary persists between rounds &mdash;
-        not raw frames or conversation history &mdash; keeping the context compact.
+        On a non-final round the agent appends a <code>&lt;select&gt;</code> request for new frames;
+        on the final round it emits only <code>&lt;think&gt;</code> and <code>&lt;answer&gt;</code>,
+        reusing the last committed summary. Only the <code>&lt;summarize&gt;</code> state persists
+        between rounds &mdash; the <code>&lt;think&gt;</code> trace is transient and raw frames are
+        never re-admitted &mdash; keeping the context compact.
       </p>
     </div>
 
     <div class="figure-block">
-      <img src="static/images/overview.png" alt="ReViSe multi-round pipeline overview">
+      <img src="static/images/overview.png?v=20260529i" alt="ReViSe multi-round pipeline overview">
       <p class="figure-caption">
         The ReViSe agent loop: sample frames &rarr; update the POHR summary &rarr; request targeted
         frames or commit an answer.
@@ -301,7 +305,7 @@
   </div>
 </footer>
 
-<script src="static/js/qual_data.js?v=20260529h"></script>
-<script src="static/js/qual.js?v=20260529h"></script>
+<script src="static/js/qual_data.js?v=20260529i"></script>
+<script src="static/js/qual.js?v=20260529i"></script>
 </body>
 </html>

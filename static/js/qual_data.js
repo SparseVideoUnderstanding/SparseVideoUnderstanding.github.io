@@ -1,7 +1,7 @@
 /* ReViSe trajectories on NExT-QA clips.
    Corrected protocol: EVERY round begins with <think> (free-form reasoning).
-   SELECT rounds: <think> + <summary>(POHR) + <frames>.
-   ANSWER round:  <think> + <answer> (no summary — it is terminal).
+   SELECT rounds: <think> + <summarize>(POHR) + <select>.
+   ANSWER round:  <think> + <answer> (no summarize — it is terminal).
    The reasoning was produced by inspecting the actual extracted frames, so every
    observation is grounded in the clip. Videos: NExT-QA (Xiao et al., CVPR 2021). */
 

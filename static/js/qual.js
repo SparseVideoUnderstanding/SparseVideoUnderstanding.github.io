@@ -25,8 +25,8 @@ Respond with EXACTLY one of two formats (no other text):
 
   • Not yet confident — request more frames:
       <think> brief reasoning over what you see </think>
-      <summary>P: …; O: …; H: …; U: …; R: …</summary>
-      <frames>idx, idx, …</frames>
+      <summarize>P: …; O: …; H: …; U: …; R: …</summarize>
+      <select>idx, idx, …</select>
 
   • Confident — give the final answer:
       <think> brief reasoning over the gathered evidence </think>
@@ -121,11 +121,12 @@ evidence is sufficient.`;
           <strong>${r.answer}</strong> &mdash; &ldquo;${esc(E().choices[li])}&rdquo;
           <span class="qual-correct">&#10003; correct</span></div>`;
     } else {
-      responseHead = `<span class="turn-who who-agent">ReViSe</span> thinks, updates its summary &amp; requests frames`;
+      responseHead = `<span class="turn-who who-agent">ReViSe</span> thinks, commits its summary &amp; selects frames`;
       responseBody = `
         <div class="think-block"><span class="tag-lab">&lt;think&gt;</span> ${esc(r.think)}</div>
+        <div class="turn-sub"><span class="tag-lab">&lt;summarize&gt;</span> committed state (carried forward)</div>
         ${pohrBlock(r.summary, false)}
-        <div class="qual-action is-request"><span class="act-tag">&lt;frames&gt;</span>
+        <div class="qual-action is-request"><span class="act-tag">&lt;select&gt;</span>
           requests frames <strong>${r.request.join(", ")}</strong> &rarr; next round</div>`;
     }
 
