@@ -923,6 +923,10 @@ body {
 .results-table a:hover { text-decoration: underline; }
 .cap-no { color: #2e9e5b; font-weight: 700; }
 .cap-yes { color: #999; }
+.rac-subhead { font-weight: 700; font-size: 0.95rem; color: #444; margin: 1.3rem 0 0.55rem; }
+.rac-body > .rac-subhead:first-child { margin-top: 0.2rem; }
+.caption-table { min-width: 620px; }
+.caption-table td, .caption-table th { white-space: nowrap; }
 
 .results-sub {
   font-weight: 700;
