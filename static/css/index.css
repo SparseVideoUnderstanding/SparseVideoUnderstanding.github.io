@@ -21,6 +21,18 @@ body {
   letter-spacing: 0.02em;
 }
 
+.venue-badge {
+  display: inline-block;
+  margin-top: 0.7rem;
+  background: #2563a8;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  border-radius: 999px;
+  padding: 0.25rem 1.05rem;
+}
+
 .publication-authors {
   margin-top: 1.25rem;
   font-size: 1.15rem;
