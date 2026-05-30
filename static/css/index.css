@@ -919,6 +919,10 @@ body {
 /* ---------- BibTeX ---------- */
 /* ---------- Results comparison tables ---------- */
 .results-table td:first-child { text-align: left; font-weight: 600; }
+.results-table a { color: #2563a8; }
+.results-table a:hover { text-decoration: underline; }
+.cap-no { color: #2e9e5b; font-weight: 700; }
+.cap-yes { color: #999; }
 
 .results-sub {
   font-weight: 700;
