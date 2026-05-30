@@ -196,9 +196,10 @@ body {
 }
 
 /* ---------- Results table ---------- */
-.results-table th {
+.results-table thead th {
   background: #363636;
-  color: #fff;
+  color: #fff !important;   /* beat Bulma's .table thead th color */
+  border-color: #4a4a4a;
 }
 
 .results-table td, .results-table th {
@@ -210,6 +211,39 @@ body {
   background: #fff5f3;
   font-weight: 600;
 }
+
+/* collapsible result tables */
+.result-acc {
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  margin-bottom: 0.7rem;
+  background: #fff;
+}
+
+.result-acc > summary {
+  cursor: pointer;
+  padding: 0.75rem 1.05rem;
+  font-weight: 700;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.result-acc > summary::-webkit-details-marker { display: none; }
+.result-acc > summary::before {
+  content: "\25B8";
+  color: #d24d3f;
+  font-size: 0.85rem;
+  align-self: center;
+}
+.result-acc[open] > summary::before { content: "\25BE"; }
+
+.result-acc .ra-bench { font-size: 1rem; }
+.result-acc .ra-tease { font-weight: 500; font-size: 0.85rem; color: #888; }
+.result-acc .rac-body { padding: 0 1.05rem 1rem; }
+.result-acc .rac-body .table-cap { margin-top: 0.3rem; }
 
 .delta-pill {
   display: inline-block;

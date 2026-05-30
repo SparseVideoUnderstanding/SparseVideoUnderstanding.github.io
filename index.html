@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=20260529k">
+  <link rel="stylesheet" href="static/css/index.css?v=20260529l">
 </head>
 <body>
 
@@ -152,7 +152,7 @@
     </div>
 
     <div class="figure-block">
-      <img src="static/images/overview.png?v=20260529k" alt="ReViSe multi-round pipeline overview">
+      <img src="static/images/overview.png?v=20260529l" alt="ReViSe multi-round pipeline overview">
       <p class="figure-caption">
         The ReViSe agent loop: sample frames &rarr; update the POHR summary &rarr; request targeted
         frames or commit an answer.
@@ -248,75 +248,94 @@
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered section-title">Results</h2>
 
-    <p class="has-text-centered qual-sub" style="margin-bottom:1.4rem;">
-      ReViSe matches or beats prior training-free methods while using <strong>far fewer frames</strong>,
-      and RL fine-tuning further improves both accuracy and efficiency. Frame counts are shown so
-      efficiency is directly comparable.
+    <p class="has-text-centered qual-sub" style="margin-bottom:1.3rem;">
+      ReViSe matches or beats prior methods while using <strong>far fewer frames</strong>, and RL
+      fine-tuning further improves both accuracy and efficiency. <em>Click a benchmark to expand its
+      comparison table.</em>
     </p>
 
     <div class="content-narrow">
-      <h4 class="results-sub">NExT-QA <span class="results-sub-note">&mdash; training-free / plug-and-play</span></h4>
-      <table class="table is-fullwidth is-bordered results-table">
-        <thead><tr><th>Method</th><th>Acc. (%)</th><th>Frames / Captions</th></tr></thead>
-        <tbody>
-          <tr><td>VideoTree</td><td>73.5</td><td>56</td></tr>
-          <tr><td>VideoAgent</td><td>71.3</td><td>8.2</td></tr>
-          <tr><td>LLoVi</td><td>67.7</td><td>90</td></tr>
-          <tr><td>ProViQ</td><td>64.6</td><td>60</td></tr>
-          <tr><td>SeViLA</td><td>63.6</td><td>32</td></tr>
-          <tr><td>LVNet</td><td>61.1</td><td>12</td></tr>
-          <tr class="highlight-row"><td>GPT-4o + ReViSe</td><td>63.8</td><td>8.4</td></tr>
-        </tbody>
-      </table>
-      <p class="table-cap">
-        Matches SeViLA's accuracy with ~4&times; fewer frames and beats LVNet; caption/selection-heavy
-        pipelines (VideoTree, ProViQ, LLoVi) use 7&ndash;11&times; more inputs.
-      </p>
+      <details class="result-acc">
+        <summary><span class="ra-bench">NExT-QA</span> <span class="ra-tease">63.8% @ 8.4 frames &middot; captioner-free, reasons directly on pixels</span></summary>
+        <div class="rac-body">
+          <table class="table is-fullwidth is-bordered results-table">
+            <thead><tr><th>Method</th><th>Acc. (%)</th><th>Frames / Captions</th><th>Reasoning input</th></tr></thead>
+            <tbody>
+              <tr><td>VideoTree</td><td>73.5</td><td>56</td><td>Captions</td></tr>
+              <tr><td>VideoAgent</td><td>71.3</td><td>8.2</td><td>Captions</td></tr>
+              <tr><td>LLoVi</td><td>67.7</td><td>90</td><td>Captions</td></tr>
+              <tr><td>ProViQ</td><td>64.6</td><td>60</td><td>Programs</td></tr>
+              <tr><td>SeViLA</td><td>63.6</td><td>32</td><td>Trained</td></tr>
+              <tr><td>LVNet</td><td>61.1</td><td>12</td><td>Keyframes</td></tr>
+              <tr class="highlight-row"><td>GPT-4o + ReViSe</td><td>63.8</td><td>8.4</td><td>Frames (no captioner)</td></tr>
+            </tbody>
+          </table>
+          <p class="table-cap">
+            <strong>Different axis vs.&nbsp;VideoAgent:</strong> VideoAgent (and VideoTree, LLoVi) reason over
+            <em>LLM-generated captions</em> of frames, so accuracy hinges on caption quality and an extra
+            captioning model. ReViSe reasons <em>directly on the frames</em> with a single frozen VLM &mdash;
+            <strong>captioner-free</strong> &mdash; at the same ~8-frame budget, and still matches SeViLA while
+            beating LVNet.
+          </p>
+        </div>
+      </details>
 
-      <h4 class="results-sub">EgoSchema (subset) <span class="results-sub-note">&mdash; training-free / plug-and-play</span></h4>
-      <table class="table is-fullwidth is-bordered results-table">
-        <thead><tr><th>Method</th><th>Acc. (%)</th><th>Frames / Captions</th></tr></thead>
-        <tbody>
-          <tr><td>LVNet</td><td>68.2</td><td>12</td></tr>
-          <tr><td>VideoTree</td><td>66.2</td><td>62.4</td></tr>
-          <tr><td>MC-ViT-L</td><td>62.6</td><td>128+</td></tr>
-          <tr><td>VideoAgent</td><td>60.2</td><td>8.4</td></tr>
-          <tr><td>LLoVi</td><td>57.6</td><td>180</td></tr>
-          <tr class="highlight-row"><td>GPT-4o + ReViSe</td><td>60.6</td><td>9.8</td></tr>
-        </tbody>
-      </table>
-      <p class="table-cap">
-        Comparable accuracy to VideoAgent / MC-ViT-L at a fraction of the frames
-        (vs 128&ndash;180 for MC-ViT-L and LLoVi).
-      </p>
+      <details class="result-acc">
+        <summary><span class="ra-bench">EgoSchema</span> <span class="ra-tease">60.6% @ 9.8 frames &middot; vs 128&ndash;180 frames for caption methods</span></summary>
+        <div class="rac-body">
+          <table class="table is-fullwidth is-bordered results-table">
+            <thead><tr><th>Method</th><th>Acc. (%)</th><th>Frames / Captions</th><th>Reasoning input</th></tr></thead>
+            <tbody>
+              <tr><td>LVNet</td><td>68.2</td><td>12</td><td>Keyframes</td></tr>
+              <tr><td>VideoTree</td><td>66.2</td><td>62.4</td><td>Captions</td></tr>
+              <tr><td>MC-ViT-L</td><td>62.6</td><td>128+</td><td>Trained</td></tr>
+              <tr><td>VideoAgent</td><td>60.2</td><td>8.4</td><td>Captions</td></tr>
+              <tr><td>LLoVi</td><td>57.6</td><td>180</td><td>Captions</td></tr>
+              <tr class="highlight-row"><td>GPT-4o + ReViSe</td><td>60.6</td><td>9.8</td><td>Frames (no captioner)</td></tr>
+            </tbody>
+          </table>
+          <p class="table-cap">
+            ReViSe edges out VideoAgent without a captioner, at a fraction of the frames used by
+            caption-/memory-heavy methods (128&ndash;180 for MC-ViT-L and LLoVi).
+          </p>
+        </div>
+      </details>
 
-      <h4 class="results-sub">Video-MME &amp; LVBench <span class="results-sub-note">(same backbone: LLaVA-OV-7B)</span></h4>
-      <table class="table is-fullwidth is-bordered results-table">
-        <thead><tr><th>Method</th><th>Video-MME (Acc / Frames)</th><th>LVBench (Acc / Frames)</th></tr></thead>
-        <tbody>
-          <tr><td>Adaptive Keyframes (CVPR&nbsp;25)</td><td>58.4 / 32</td><td>59.3 / 32</td></tr>
-          <tr><td>MDP3 (ICCV&nbsp;25)</td><td>59.6 / 8</td><td>59.0 / 8</td></tr>
-          <tr class="highlight-row"><td>ReViSe</td><td>60.7 / 7.38</td><td>61.5 / 5.62</td></tr>
-        </tbody>
-      </table>
-      <p class="table-cap">Best accuracy on <em>both</em> benchmarks while using the fewest frames.</p>
+      <details class="result-acc">
+        <summary><span class="ra-bench">Video-MME &amp; LVBench</span> <span class="ra-tease">best accuracy <em>and</em> fewest frames on both (LLaVA-OV-7B)</span></summary>
+        <div class="rac-body">
+          <table class="table is-fullwidth is-bordered results-table">
+            <thead><tr><th>Method</th><th>Video-MME (Acc / Frames)</th><th>LVBench (Acc / Frames)</th></tr></thead>
+            <tbody>
+              <tr><td>Adaptive Keyframes (CVPR&nbsp;25)</td><td>58.4 / 32</td><td>59.3 / 32</td></tr>
+              <tr><td>MDP3 (ICCV&nbsp;25)</td><td>59.6 / 8</td><td>59.0 / 8</td></tr>
+              <tr class="highlight-row"><td>ReViSe</td><td>60.7 / 7.38</td><td>61.5 / 5.62</td></tr>
+            </tbody>
+          </table>
+          <p class="table-cap">Under the same backbone, ReViSe is best on <em>both</em> benchmarks while using the fewest frames.</p>
+        </div>
+      </details>
 
-      <h4 class="results-sub">RL fine-tuning on NExT-QA <span class="results-sub-note">(Qwen2.5-VL-3B backbone)</span></h4>
-      <table class="table is-fullwidth is-bordered results-table">
-        <thead><tr><th>Method</th><th>Acc. (%)</th><th>Frames</th><th>Rounds</th><th>Time (s)</th></tr></thead>
-        <tbody>
-          <tr><td>Direct Reasoning</td><td>23.6</td><td>8.0</td><td>1.00</td><td>0.88</td></tr>
-          <tr><td>Plug-and-Play</td><td>31.7</td><td>5.3</td><td>1.74</td><td>1.22</td></tr>
-          <tr><td>Supervised Format FT</td><td>27.3</td><td>5.1</td><td>1.65</td><td>1.13</td></tr>
-          <tr class="highlight-row"><td>Reinforced FT (ReViSe)</td><td>51.3</td><td>3.9</td><td>1.32</td><td>0.62</td></tr>
-        </tbody>
-      </table>
-      <p class="has-text-centered" style="margin-top:0.6rem;">
-        RL fine-tuning yields <span class="delta-pill">+19.6pp</span> over plug-and-play with
-        <strong>fewer frames, fewer rounds, and ~2&times; faster inference</strong>.
-      </p>
+      <details class="result-acc">
+        <summary><span class="ra-bench">RL fine-tuning &middot; NExT-QA</span> <span class="ra-tease">+19.6pp over plug-and-play, ~2&times; faster (Qwen2.5-VL-3B)</span></summary>
+        <div class="rac-body">
+          <table class="table is-fullwidth is-bordered results-table">
+            <thead><tr><th>Method</th><th>Acc. (%)</th><th>Frames</th><th>Rounds</th><th>Time (s)</th></tr></thead>
+            <tbody>
+              <tr><td>Direct Reasoning</td><td>23.6</td><td>8.0</td><td>1.00</td><td>0.88</td></tr>
+              <tr><td>Plug-and-Play</td><td>31.7</td><td>5.3</td><td>1.74</td><td>1.22</td></tr>
+              <tr><td>Supervised Format FT</td><td>27.3</td><td>5.1</td><td>1.65</td><td>1.13</td></tr>
+              <tr class="highlight-row"><td>Reinforced FT (ReViSe)</td><td>51.3</td><td>3.9</td><td>1.32</td><td>0.62</td></tr>
+            </tbody>
+          </table>
+          <p class="has-text-centered" style="margin-top:0.5rem;">
+            RL fine-tuning yields <span class="delta-pill">+19.6pp</span> over plug-and-play with
+            <strong>fewer frames, fewer rounds, and ~2&times; faster inference</strong> (0.62&nbsp;s vs 1.22&nbsp;s).
+          </p>
+        </div>
+      </details>
 
-      <p class="table-cap" style="text-align:center; margin-top:1.1rem;">
+      <p class="table-cap" style="text-align:center; margin-top:0.9rem;">
         VideoEspresso comparisons are being updated &mdash; see the note at the top of the page.
       </p>
     </div>
@@ -366,7 +385,7 @@
   </div>
 </footer>
 
-<script src="static/js/qual_data.js?v=20260529k"></script>
-<script src="static/js/qual.js?v=20260529k"></script>
+<script src="static/js/qual_data.js?v=20260529l"></script>
+<script src="static/js/qual.js?v=20260529l"></script>
 </body>
 </html>
