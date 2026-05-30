@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=20260529l">
+  <link rel="stylesheet" href="static/css/index.css?v=20260529m">
 </head>
 <body>
 
@@ -152,7 +152,7 @@
     </div>
 
     <div class="figure-block">
-      <img src="static/images/overview.png?v=20260529l" alt="ReViSe multi-round pipeline overview">
+      <img src="static/images/overview.png?v=20260529m" alt="ReViSe multi-round pipeline overview">
       <p class="figure-caption">
         The ReViSe agent loop: sample frames &rarr; update the POHR summary &rarr; request targeted
         frames or commit an answer.
@@ -250,53 +250,55 @@
 
     <p class="has-text-centered qual-sub" style="margin-bottom:1.3rem;">
       ReViSe matches or beats prior methods while using <strong>far fewer frames</strong>, and RL
-      fine-tuning further improves both accuracy and efficiency. <em>Click a benchmark to expand its
-      comparison table.</em>
+      fine-tuning further improves both accuracy and efficiency. Notably, it
+      <strong>surpasses the caption-based agent VideoAgent on EgoSchema</strong> (60.6 vs 60.2) and is
+      best overall on Video-MME &amp; LVBench &mdash; all <strong>captioner-free</strong>.
+      <em>Click a benchmark to expand its comparison table.</em>
     </p>
 
     <div class="content-narrow">
       <details class="result-acc">
-        <summary><span class="ra-bench">NExT-QA</span> <span class="ra-tease">63.8% @ 8.4 frames &middot; captioner-free, reasons directly on pixels</span></summary>
+        <summary><span class="ra-bench">NExT-QA</span> <span class="ra-tease">63.8% @ 8.4 frames &middot; captioner-free (GPT-4o), reasons directly on pixels</span></summary>
         <div class="rac-body">
           <table class="table is-fullwidth is-bordered results-table">
-            <thead><tr><th>Method</th><th>Acc. (%)</th><th>Frames / Captions</th><th>Reasoning input</th></tr></thead>
+            <thead><tr><th>Method</th><th>Backbone</th><th>Acc. (%)</th><th>Frames / Captions</th><th>Reasoning input</th></tr></thead>
             <tbody>
-              <tr><td>VideoTree</td><td>73.5</td><td>56</td><td>Captions</td></tr>
-              <tr><td>VideoAgent</td><td>71.3</td><td>8.2</td><td>Captions</td></tr>
-              <tr><td>LLoVi</td><td>67.7</td><td>90</td><td>Captions</td></tr>
-              <tr><td>ProViQ</td><td>64.6</td><td>60</td><td>Programs</td></tr>
-              <tr><td>SeViLA</td><td>63.6</td><td>32</td><td>Trained</td></tr>
-              <tr><td>LVNet</td><td>61.1</td><td>12</td><td>Keyframes</td></tr>
-              <tr class="highlight-row"><td>GPT-4o + ReViSe</td><td>63.8</td><td>8.4</td><td>Frames (no captioner)</td></tr>
+              <tr><td>VideoTree</td><td>GPT-4</td><td>73.5</td><td>56</td><td>Captions</td></tr>
+              <tr><td>VideoAgent</td><td>GPT-4</td><td>71.3</td><td>8.2</td><td>Captions</td></tr>
+              <tr><td>LLoVi</td><td>GPT-3.5</td><td>67.7</td><td>90</td><td>Captions</td></tr>
+              <tr><td>ProViQ</td><td>GPT-3.5</td><td>64.6</td><td>60</td><td>Programs</td></tr>
+              <tr><td>SeViLA</td><td>BLIP-2</td><td>63.6</td><td>32</td><td>Trained</td></tr>
+              <tr><td>LVNet</td><td>GPT-4o</td><td>61.1</td><td>12</td><td>Keyframes</td></tr>
+              <tr class="highlight-row"><td>ReViSe</td><td>GPT-4o</td><td>63.8</td><td>8.4</td><td>Frames (no captioner)</td></tr>
             </tbody>
           </table>
           <p class="table-cap">
-            <strong>Different axis vs.&nbsp;VideoAgent:</strong> VideoAgent (and VideoTree, LLoVi) reason over
-            <em>LLM-generated captions</em> of frames, so accuracy hinges on caption quality and an extra
-            captioning model. ReViSe reasons <em>directly on the frames</em> with a single frozen VLM &mdash;
-            <strong>captioner-free</strong> &mdash; at the same ~8-frame budget, and still matches SeViLA while
-            beating LVNet.
+            <strong>A fair axis vs.&nbsp;VideoAgent:</strong> VideoAgent (and VideoTree, LLoVi) reason over
+            <em>LLM-generated captions</em> of frames &mdash; an extra captioner plus GPT-4 &mdash; so accuracy
+            hinges on caption quality. ReViSe reasons <em>directly on the frames</em> with a single frozen VLM,
+            <strong>captioner-free</strong>, at the same ~8-frame budget. On <strong>EgoSchema it surpasses
+            VideoAgent</strong> (60.6 vs 60.2), and on Video-MME &amp; LVBench it is best overall.
           </p>
         </div>
       </details>
 
       <details class="result-acc">
-        <summary><span class="ra-bench">EgoSchema</span> <span class="ra-tease">60.6% @ 9.8 frames &middot; vs 128&ndash;180 frames for caption methods</span></summary>
+        <summary><span class="ra-bench">EgoSchema</span> <span class="ra-tease">60.6% @ 9.8 frames &middot; beats VideoAgent (60.2), captioner-free</span></summary>
         <div class="rac-body">
           <table class="table is-fullwidth is-bordered results-table">
-            <thead><tr><th>Method</th><th>Acc. (%)</th><th>Frames / Captions</th><th>Reasoning input</th></tr></thead>
+            <thead><tr><th>Method</th><th>Backbone</th><th>Acc. (%)</th><th>Frames / Captions</th><th>Reasoning input</th></tr></thead>
             <tbody>
-              <tr><td>LVNet</td><td>68.2</td><td>12</td><td>Keyframes</td></tr>
-              <tr><td>VideoTree</td><td>66.2</td><td>62.4</td><td>Captions</td></tr>
-              <tr><td>MC-ViT-L</td><td>62.6</td><td>128+</td><td>Trained</td></tr>
-              <tr><td>VideoAgent</td><td>60.2</td><td>8.4</td><td>Captions</td></tr>
-              <tr><td>LLoVi</td><td>57.6</td><td>180</td><td>Captions</td></tr>
-              <tr class="highlight-row"><td>GPT-4o + ReViSe</td><td>60.6</td><td>9.8</td><td>Frames (no captioner)</td></tr>
+              <tr><td>LVNet</td><td>GPT-4o</td><td>68.2</td><td>12</td><td>Keyframes</td></tr>
+              <tr><td>VideoTree</td><td>GPT-4</td><td>66.2</td><td>62.4</td><td>Captions</td></tr>
+              <tr><td>MC-ViT-L</td><td>ViT-L</td><td>62.6</td><td>128+</td><td>Trained</td></tr>
+              <tr><td>VideoAgent</td><td>GPT-4</td><td>60.2</td><td>8.4</td><td>Captions</td></tr>
+              <tr><td>LLoVi</td><td>GPT-3.5</td><td>57.6</td><td>180</td><td>Captions</td></tr>
+              <tr class="highlight-row"><td>ReViSe</td><td>GPT-4o</td><td>60.6</td><td>9.8</td><td>Frames (no captioner)</td></tr>
             </tbody>
           </table>
           <p class="table-cap">
-            ReViSe edges out VideoAgent without a captioner, at a fraction of the frames used by
-            caption-/memory-heavy methods (128&ndash;180 for MC-ViT-L and LLoVi).
+            ReViSe <strong>surpasses VideoAgent</strong> (60.6 vs 60.2) without a captioner, at a fraction of
+            the frames used by caption-/memory-heavy methods (128&ndash;180 for MC-ViT-L and LLoVi).
           </p>
         </div>
       </details>
@@ -385,7 +387,7 @@
   </div>
 </footer>
 
-<script src="static/js/qual_data.js?v=20260529l"></script>
-<script src="static/js/qual.js?v=20260529l"></script>
+<script src="static/js/qual_data.js?v=20260529m"></script>
+<script src="static/js/qual.js?v=20260529m"></script>
 </body>
 </html>

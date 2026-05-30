@@ -242,7 +242,7 @@ body {
 
 .result-acc .ra-bench { font-size: 1rem; }
 .result-acc .ra-tease { font-weight: 500; font-size: 0.85rem; color: #888; }
-.result-acc .rac-body { padding: 0 1.05rem 1rem; }
+.result-acc .rac-body { padding: 0 1.05rem 1rem; overflow-x: auto; }
 .result-acc .rac-body .table-cap { margin-top: 0.3rem; }
 
 .delta-pill {
