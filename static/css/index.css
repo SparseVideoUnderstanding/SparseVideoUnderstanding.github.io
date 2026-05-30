@@ -883,6 +883,22 @@ body {
 }
 
 /* ---------- BibTeX ---------- */
+/* ---------- Results comparison tables ---------- */
+.results-table td:first-child { text-align: left; font-weight: 600; }
+
+.results-sub {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 1.8rem 0 0.6rem;
+  color: #2c2c2c;
+}
+
+.results-sub:first-of-type { margin-top: 0; }
+
+.results-sub-note { font-weight: 500; font-size: 0.85rem; color: #999; }
+
+.table-cap { font-size: 0.86rem; color: #777; margin: -0.05rem 0 0.5rem; }
+
 .bibtex-wrap {
   position: relative;
 }
